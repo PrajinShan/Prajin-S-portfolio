@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prajin S | Data Scientist</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8; /* Sky Blue */
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Glows */
+        .glow-bg {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -200px;
+            left: -200px;
+            z-index: -1;
+            border-radius: 50%;
+        }
+        
+        .glow-bg-2 {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(129, 140, 248, 0.1) 0%, rgba(0,0,0,0) 70%);
+            bottom: -100px;
+            right: -100px;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 60px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-btn {
+            color: var(--text-main);
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-btn:hover {
+            color: var(--accent);
+        }
+
+        /* --- Hero --- */
+        .hero {
+            padding: 80px 0;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .highlight {
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--accent-gradient);
+            color: #0f172a;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #38bdf8;
+            color: #38bdf8;
+            margin-left: 15px;
+        }
+
+        .btn-outline:hover {
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        /* --- Section Titles --- */
+        h2 {
+            font-size: 2rem;
+            margin: 80px 0 40px 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #334155;
+            margin-left: 20px;
+        }
+
+        /* --- Cards (Glassmorphism) --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            background: rgba(56, 189, 248, 0.1);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* --- Skills List --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .skill {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-weight: 500;
+        }
+
+        .skill:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* --- Contact / Footer --- */
+        footer {
+            margin-top: 100px;
+            padding: 50px 0;
+            border-top: 1px solid #334155;
+            text-align: center;
+        }
+
+        .social-links {
+            margin: 30px 0;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.8rem;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow-bg"></div>
+    <div class="glow-bg-2"></div>
+
+    <div class="container">
+        
+        <header>
+            <div class="logo">Prajin S.</div>
+            <nav>
+                <a href="#projects" class="nav-btn">Work</a>
+                <a href="#about" class="nav-btn">About</a>
+                <a href="#contact" class="nav-btn" style="color: var(--accent);">Contact</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Building intelligent <br><span class="highlight">Data Systems.</span></h1>
+            <p>I'm a Data Scientist and AI Engineer based in Erode, India. I specialize in turning raw data into profitable business decisions through Machine Learning and Deepfake Detection technologies.</p>
+            <div style="margin-top: 30px;">
+                <a href="#projects" class="btn">View My Work</a>
+                <a href="mailto:prajin.shanmugaraj@gmail.com" class="btn btn-outline">Email Me</a>
+            </div>
+        </section>
+
+        <section id="skills">
+            <h2>Technical Arsenal</h2>
+            <div class="skills-grid">
+                <div class="skill">Python</div>
+                <div class="skill">Java</div>
+                <div class="skill">C</div>
+                <div class="skill">Machine Learning</div>
+                <div class="skill">Pandas</div>
+                <div class="skill">Power BI</div>
+                <div class="skill">Git</div>
+                <div class="skill">HTML/CSS</div>
+                <div class="skill">Bootstrap</div>
+                <div class="skill">VS Code</div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2>Featured Projects</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-user-secret"></i></div>
+                    <h3>Deepfake Detection System</h3>
+                    <p>A scalable machine learning system designed to identify manipulation artifacts in video, image, and audio files to verify authenticity.</p>
+                    <div class="tag-container">
+                        <span class="tag">Python</span>
+                        <span class="tag">ML</span>
+                        <span class="tag">Security</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-video"></i></div>
+                    <h3>Adaptive CCTV Analytics</h3>
+                    <p>Smart surveillance system that optimizes bandwidth by switching between high-res and low-res processing based on crowd density. Built for 5G Hackathon.</p>
+                    <div class="tag-container">
+                        <span class="tag">Computer Vision</span>
+                        <span class="tag">IoT</span>
+                        <span class="tag">Optimization</span>
+                    </div>
+                </div>
+
+                 <div class="card">
+                    <div class="card-icon"><i class="fas fa-briefcase"></i></div>
+                    <h3>Data Science Intern</h3>
+                    <p><strong>YBI Foundation (Dec 2024)</strong><br>Applied core data science principles to clean and analyze data. Emphasized workflow automation using Pandas.</p>
+                    <div class="tag-container">
+                        <span class="tag">Internship</span>
+                        <span class="tag">Data Analysis</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>About & Education</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Education</h3>
+                    <ul style="list-style: none; color: var(--text-secondary); margin-top: 15px;">
+                        <li style="margin-bottom: 15px;">
+                            <strong style="color: #fff;">B.Tech AI & Data Science</strong><br>
+                            Velalar College of Eng. & Tech<br>
+                            <span style="font-size: 0.9rem; color: var(--accent);">CGPA: 7.7 (Current)</span>
+                        </li>
+                        <li>
+                            <strong style="color: #fff;">HSC (XII)</strong><br>
+                            Bharathi Vidyalaya HSS<br>
+                            <span style="font-size: 0.9rem;">81.33% (2023)</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Certifications & Achievements</h3>
+                    <ul style="list-style: none; color: var(--text-secondary); margin-top: 15px;">
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--accent); margin-right: 10px;"></i>NPTEL Cloud Computing</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--accent); margin-right: 10px;"></i>Industry 4.0 & IoT</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-trophy" style="color: var(--accent); margin-right: 10px;"></i>VIT Chennai 5G Hackathon Participant</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-certificate" style="color: var(--accent); margin-right: 10px;"></i>IIT Bombay Python Training</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact">
+            <h2 style="justify-content: center; margin-top: 0;">Let's Connect</h2>
+            <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 30px auto;">
+                I am currently looking for opportunities in Data Science and Artificial Intelligence.
+            </p>
+            
+            <a href="mailto:prajin.shanmugaraj@gmail.com" class="btn">prajin.shanmugaraj@gmail.com</a>
+            
+            <div class="social-links">
+                <a href="https://github.com/PrajinShan"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/prajin-shan"><i class="fab fa-linkedin"></i></a>
+                <a href="tel:+919884430666"><i class="fas fa-phone"></i></a>
+            </div>
+
+            <p style="font-size: 0.8rem; color: #64748b;">&copy; 2026 Prajin S. Built with code.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
