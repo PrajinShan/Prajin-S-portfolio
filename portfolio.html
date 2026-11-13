@@ -1,0 +1,2634 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prajin S — AI &amp; Data Science</title>
+  <meta name="description" content="Prajin S — AI & Data Science Architect. Fit Surfer, CCTV Adaptive Video Analytics, Screenly AI, Pathwise Companion." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #040814;
+      --glass: rgba(10, 19, 42, 0.48);
+      --border-hair: rgba(255, 255, 255, 0.085);
+      --border-sapphire: rgba(96, 165, 250, 0.24);
+      --border-gold: rgba(212, 175, 55, 0.36);
+      --sapphire: #3b82f6;
+      --sapphire-soft: #93c5fd;
+      --gold: #d4af37;
+      --gold-light: #ebd078;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      body, a, button, input, textarea, select { cursor: none !important; }
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #03060f; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(59, 130, 246, 0.55), rgba(212, 175, 55, 0.65));
+      border-radius: 99px;
+    }
+
+    #bg-3d {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .atmosphere {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 65% 50% at 14% 12%, rgba(37, 99, 235, 0.12), transparent 70%),
+        radial-gradient(ellipse 50% 42% at 88% 20%, rgba(212, 175, 55, 0.07), transparent 72%),
+        radial-gradient(circle at 50% 50%, transparent 50%, rgba(2, 5, 14, 0.78) 100%);
+    }
+
+    /* Compact Red Glassmorphism Cursor + Golden Yellow Outer Luminescence (Zero Yellow Border) */
+    #cursor-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99990;
+      pointer-events: none;
+    }
+    #cursor-lens {
+      position: fixed;
+      top: 0; left: 0;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 32%, rgba(254, 202, 202, 0.34), rgba(220, 38, 38, 0.32) 60%, rgba(127, 29, 29, 0.42) 100%);
+      border: 1px solid rgba(248, 113, 113, 0.55);
+      backdrop-filter: blur(6px) saturate(145%);
+      -webkit-backdrop-filter: blur(6px) saturate(145%);
+      box-shadow:
+        0 0 14px 3px rgba(250, 204, 21, 0.34),
+        0 0 28px 6px rgba(234, 179, 8, 0.16),
+        inset 0 1px 2px rgba(255, 255, 255, 0.32);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 99995;
+      opacity: 0;
+      transition: width 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+                  height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.22s, box-shadow 0.22s, opacity 0.22s;
+    }
+    body.c-hover #cursor-lens {
+      width: 30px; height: 30px;
+      border-color: rgba(252, 165, 165, 0.78);
+      box-shadow:
+        0 0 18px 4px rgba(250, 204, 21, 0.44),
+        0 0 38px 9px rgba(234, 179, 8, 0.2),
+        inset 0 1px 3px rgba(255, 255, 255, 0.38);
+    }
+    body.c-drag #cursor-lens {
+      width: 16px; height: 16px;
+      box-shadow:
+        0 0 16px 4px rgba(250, 204, 21, 0.48),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35);
+    }
+    #cursor-tag {
+      position: fixed;
+      top: 0; left: 0;
+      transform: translate(16px, 16px);
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #fecaca;
+      background: rgba(69, 10, 10, 0.68);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(248, 113, 113, 0.42);
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.24);
+      padding: 0.16rem 0.48rem;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 99996;
+      display: none;
+    }
+    #cursor-tag.show { display: block; }
+    @media (hover: none), (pointer: coarse) {
+      #cursor-canvas, #cursor-lens, #cursor-tag { display: none !important; }
+    }
+
+    /* 3D Rover Bot Overlay */
+    #bot-3d-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 880;
+      pointer-events: none;
+    }
+    #bot-hitbox {
+      position: fixed;
+      width: 128px;
+      height: 136px;
+      z-index: 890;
+      touch-action: none;
+      user-select: none;
+      transform: translate(-50%, -100%);
+    }
+    #bot-whisper {
+      position: fixed;
+      z-index: 895;
+      max-width: 230px;
+      background: rgba(7, 14, 34, 0.88);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: #e2e8f0;
+      font-size: 0.74rem;
+      line-height: 1.45;
+      padding: 0.48rem 0.78rem;
+      border-radius: 12px 12px 12px 2px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-10%, -100%) translateY(-10px);
+      transition: opacity 0.28s ease;
+    }
+    #bot-whisper.show { opacity: 1; }
+
+    /* Main Stage */
+    .stage { position: relative; z-index: 2; }
+    .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 1.65rem; }
+
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(26px) saturate(130%);
+      -webkit-backdrop-filter: blur(26px) saturate(130%);
+      border: 1px solid var(--border-hair);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s, box-shadow 0.35s;
+    }
+    .glass-hover:hover {
+      border-color: var(--border-gold);
+      box-shadow:
+        0 28px 70px rgba(0, 0, 0, 0.58),
+        0 0 40px rgba(59, 130, 246, 0.09),
+        inset 0 1px 0 rgba(235, 208, 120, 0.16);
+      transform: translateY(-2px);
+    }
+
+    /* Editorial Top Navigation */
+    header.topbar {
+      position: fixed;
+      top: 1.05rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(1148px, calc(100% - 2rem));
+      z-index: 120;
+      background: rgba(7, 14, 34, 0.62);
+      backdrop-filter: blur(24px) saturate(145%);
+      -webkit-backdrop-filter: blur(24px) saturate(145%);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 0.68rem 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--text-primary); }
+    .brand-mark {
+      width: 32px; height: 32px; border-radius: 9px;
+      border: 1px solid var(--border-gold);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(212, 175, 55, 0.14));
+      display: grid; place-items: center;
+      font-family: var(--font-serif); font-style: italic; font-size: 1rem; font-weight: 600; color: var(--gold-light);
+    }
+    .brand-name { font-size: 0.88rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    nav ul { display: flex; list-style: none; gap: 0.35rem; }
+    nav a {
+      text-decoration: none; color: var(--text-secondary); font-size: 0.8rem; font-weight: 500;
+      padding: 0.42rem 0.8rem; border-radius: 8px; transition: color 0.25s, background 0.25s;
+    }
+    nav a:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.05); }
+
+    .nav-cta { display: flex; align-items: center; gap: 0.6rem; }
+    .btn-ghost {
+      background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.32);
+      color: var(--gold-light); font-size: 0.78rem; font-weight: 500;
+      padding: 0.46rem 0.95rem; border-radius: 9px; text-decoration: none; transition: all 0.25s;
+    }
+    .btn-ghost:hover { background: rgba(212, 175, 55, 0.16); border-color: var(--gold-light); }
+    .mobile-btn {
+      display: none; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-hair);
+      color: #fff; padding: 0.4rem 0.65rem; border-radius: 8px;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.55rem;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(29, 78, 216, 0.95));
+      border: 1px solid rgba(147, 197, 253, 0.35); color: #ffffff;
+      font-size: 0.85rem; font-weight: 500; padding: 0.78rem 1.4rem; border-radius: 11px;
+      text-decoration: none; box-shadow: 0 12px 30px rgba(37, 99, 235, 0.26); transition: all 0.28s;
+    }
+    .btn-primary:hover { border-color: var(--gold-light); box-shadow: 0 16px 38px rgba(37, 99, 235, 0.38); transform: translateY(-1px); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 0.55rem;
+      background: rgba(10, 19, 42, 0.55); border: 1px solid var(--border-hair);
+      color: var(--text-primary); font-size: 0.85rem; font-weight: 500;
+      padding: 0.78rem 1.3rem; border-radius: 11px; text-decoration: none; transition: all 0.28s;
+    }
+    .btn-outline:hover { border-color: var(--border-gold); color: var(--gold-light); transform: translateY(-1px); }
+
+    /* Hero */
+    .hero { min-height: 100vh; display: flex; align-items: center; padding: 5.8rem 0 3.2rem; }
+    .hero-grid { display: grid; grid-template-columns: 1.25fr 0.78fr; gap: 3.5rem; align-items: center; }
+    .index-label {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold-light); display: inline-flex; align-items: center; gap: 0.65rem; margin-bottom: 1rem;
+    }
+    .index-label::before { content: ""; width: 24px; height: 1px; background: var(--gold); }
+    .hero-name {
+      font-size: clamp(2.65rem, 5.2vw, 4.45rem); font-weight: 600; letter-spacing: -0.035em;
+      line-height: 1.03; margin-bottom: 0.85rem; color: #ffffff;
+    }
+    .hero-name em { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--gold-light); }
+    .hero-lead { font-size: clamp(1.04rem, 1.7vw, 1.26rem); color: #cbd5e1; max-width: 550px; margin-bottom: 0.9rem; }
+    .hero-lead span { color: var(--sapphire-soft); }
+    .hero-bio { font-size: 0.92rem; color: var(--text-secondary); max-width: 530px; margin-bottom: 1.65rem; }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 2rem; }
+
+    .metrics-strip {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem;
+      max-width: 480px; padding-top: 1.2rem; border-top: 1px solid var(--border-hair);
+    }
+    .metric strong { display: block; font-size: 1.38rem; font-weight: 600; color: var(--gold-light); }
+    .metric span { font-family: var(--font-mono); font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+
+    /* Portrait Card */
+    .portrait-wrap { perspective: 1100px; display: flex; justify-content: center; }
+    .portrait-card {
+      width: 296px; padding: 0.95rem; border-radius: 22px;
+      background: linear-gradient(160deg, rgba(16, 30, 65, 0.64), rgba(6, 12, 28, 0.84));
+      backdrop-filter: blur(28px); border: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      transform-style: preserve-3d; transition: transform 0.22s ease-out;
+    }
+    .portrait-frame {
+      width: 100%; aspect-ratio: 4 / 4.65; border-radius: 14px; overflow: hidden;
+      background: #060d1f; border: 1px solid rgba(212, 175, 55, 0.24);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .portrait-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .portrait-placeholder { padding: 1.35rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.7rem; }
+    .portrait-initials {
+      width: 72px; height: 72px; border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.42);
+      display: grid; place-items: center; font-family: var(--font-serif); font-style: italic; font-size: 1.75rem; color: var(--gold-light);
+    }
+    .portrait-caption { padding: 0.8rem 0.2rem 0.1rem; display: flex; justify-content: space-between; align-items: baseline; }
+    .portrait-caption strong { font-size: 0.9rem; font-weight: 600; }
+    .portrait-caption span { font-family: var(--font-mono); font-size: 0.62rem; color: var(--gold-light); letter-spacing: 0.08em; }
+
+    /* Sections */
+    section.section { padding: 5.5rem 0 2rem; }
+    .section-head {
+      display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+      gap: 1.25rem; margin-bottom: 2.5rem; padding-bottom: 1.15rem; border-bottom: 1px solid var(--border-hair);
+    }
+    .section-title { font-size: clamp(1.8rem, 3.2vw, 2.5rem); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
+    .section-title em { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--gold-light); }
+    .section-desc { font-size: 0.89rem; color: var(--text-secondary); max-width: 400px; }
+
+    /* Showcase */
+    .showcase-grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items: stretch; }
+    .showcase-index { display: flex; flex-direction: column; gap: 0.75rem; }
+    .proj-tab {
+      text-align: left; padding: 1.15rem 1.25rem; border-radius: 16px;
+      background: rgba(10, 19, 42, 0.36); border: 1px solid var(--border-hair);
+      backdrop-filter: blur(18px); color: var(--text-primary); transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .proj-tab:hover { background: rgba(14, 27, 58, 0.56); border-color: rgba(147, 197, 253, 0.25); }
+    .proj-tab.active {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(212, 175, 55, 0.07));
+      border-color: var(--border-gold); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    }
+    .proj-tab-meta { font-family: var(--font-mono); font-size: 0.63rem; letter-spacing: 0.14em; color: var(--sapphire-soft); margin-bottom: 0.3rem; display: flex; justify-content: space-between; }
+    .proj-tab-meta.dev { color: var(--gold-light); }
+    .proj-tab-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .proj-tab-sub { font-size: 0.79rem; color: var(--text-secondary); line-height: 1.45; }
+
+    .showcase-stage { padding: 2.15rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem; min-height: 470px; }
+    .stage-badge {
+      font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 0.32rem 0.75rem; border-radius: 999px; border: 1px solid var(--border-sapphire);
+      background: rgba(59, 130, 246, 0.1); color: var(--sapphire-soft); display: inline-block;
+    }
+    .stage-badge.dev { border-color: var(--border-gold); background: rgba(212, 175, 55, 0.1); color: var(--gold-light); }
+    .stage-flow {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem;
+      padding: 1.1rem; border-radius: 14px; background: rgba(4, 9, 22, 0.56); border: 1px solid var(--border-hair);
+    }
+    .flow-node { padding: 0.7rem 0.85rem; border-radius: 10px; background: rgba(12, 23, 50, 0.6); border: 1px solid rgba(147, 197, 253, 0.12); }
+    .flow-node small { display: block; font-family: var(--font-mono); font-size: 0.61rem; letter-spacing: 0.12em; color: var(--gold-light); margin-bottom: 0.2rem; }
+    .flow-node strong { font-size: 0.84rem; font-weight: 500; }
+
+    .gh-inspect-bar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.95rem 1.15rem; border-radius: 14px; background: rgba(4, 9, 22, 0.62); border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .clean-list { list-style: none; display: flex; flex-direction: column; gap: 0.52rem; font-size: 0.91rem; color: #cbd5e1; }
+    .clean-list li { position: relative; padding-left: 1.15rem; }
+    .clean-list li::before { content: "—"; position: absolute; left: 0; color: var(--gold); }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .tag { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.28rem 0.7rem; border-radius: 999px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(147, 197, 253, 0.18); color: #dbeafe; }
+    .tag.gold { background: rgba(212, 175, 55, 0.08); border-color: rgba(212, 175, 55, 0.26); color: var(--gold-light); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; align-items: stretch; }
+    .pad { padding: 1.75rem; }
+
+    .profile-card { display: flex; flex-direction: column; padding: 1.75rem; height: 100%; }
+    .profile-card-top { display: flex; justify-content: space-between; align-items: center; min-height: 1.25rem; margin-bottom: 0.45rem; }
+    .profile-card-kicker { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; color: var(--sapphire-soft); text-transform: uppercase; }
+    .profile-card-status { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; color: var(--gold-light); }
+    .profile-card-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.35rem; }
+    .profile-card-desc { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; min-height: 2.7rem; margin-bottom: 1.1rem; }
+    .stat-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; margin-bottom: 1.25rem; }
+    .stat-box {
+      padding: 0.72rem 0.45rem; border-radius: 11px; background: rgba(4, 9, 22, 0.55);
+      border: 1px solid var(--border-hair); text-align: center;
+      display: flex; flex-direction: column; justify-content: center; min-height: 62px;
+    }
+    .stat-box strong { display: block; font-size: 1.12rem; font-weight: 600; color: var(--gold-light); line-height: 1.25; }
+    .stat-box span { font-family: var(--font-mono); font-size: 0.59rem; color: var(--text-muted); letter-spacing: 0.08em; margin-top: 0.15rem; }
+    .profile-card-cta { margin-top: auto; width: 100%; justify-content: center; padding: 0.68rem 1rem !important; }
+
+    .timeline { border-left: 1px solid rgba(147, 197, 253, 0.22); padding-left: 1.45rem; display: flex; flex-direction: column; gap: 1.4rem; }
+    .t-node { position: relative; }
+    .t-node::before { content: ""; position: absolute; left: -1.72rem; top: 0.48rem; width: 7px; height: 7px; border-radius: 50%; background: var(--gold-light); }
+    .t-top { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold-light); display: flex; justify-content: space-between; margin-bottom: 0.22rem; }
+
+    .sk-row { margin-bottom: 0.95rem; }
+    .sk-row:last-child { margin-bottom: 0; }
+    .sk-head { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem; }
+    .sk-track { height: 4px; background: rgba(255, 255, 255, 0.07); border-radius: 99px; overflow: hidden; }
+    .sk-fill { height: 100%; background: linear-gradient(90deg, var(--sapphire), var(--gold-light)); }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.6rem; }
+    .f-btn {
+      background: rgba(10, 19, 42, 0.5); border: 1px solid var(--border-hair); color: var(--text-secondary);
+      font-family: var(--font-mono); font-size: 0.72rem; padding: 0.42rem 0.92rem; border-radius: 999px; transition: all 0.25s;
+    }
+    .f-btn.active, .f-btn:hover { border-color: var(--border-gold); color: var(--gold-light); background: rgba(212, 175, 55, 0.08); }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.75s ease, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1); }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* Eon AI Drawer */
+    #ai-drawer {
+      position: fixed; right: 24px; bottom: 24px; width: min(375px, calc(100vw - 32px)); max-height: 490px;
+      z-index: 950; background: rgba(7, 14, 34, 0.92); backdrop-filter: blur(28px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 30px 75px rgba(0, 0, 0, 0.72);
+      border-radius: 20px; display: none; flex-direction: column; overflow: hidden;
+    }
+    #ai-drawer.open { display: flex; }
+    .drawer-top { padding: 0.9rem 1.15rem; border-bottom: 1px solid var(--border-hair); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-log { padding: 1rem; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.65rem; max-height: 265px; }
+    .msg { font-size: 0.82rem; padding: 0.62rem 0.85rem; border-radius: 12px; max-width: 88%; line-height: 1.48; }
+    .msg.ai { align-self: flex-start; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(147, 197, 253, 0.18); color: #e2e8f0; }
+    .msg.me { align-self: flex-end; background: rgba(212, 175, 55, 0.11); border: 1px solid rgba(212, 175, 55, 0.25); color: var(--gold-light); }
+    .drawer-prompts { padding: 0.5rem 0.9rem; display: flex; flex-wrap: wrap; gap: 0.38rem; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+    .d-chip {
+      font-family: var(--font-mono); font-size: 0.65rem; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-hair); color: var(--sapphire-soft); padding: 0.25rem 0.58rem; border-radius: 999px;
+    }
+    .d-chip:hover { border-color: var(--border-gold); color: var(--gold-light); }
+    .drawer-form { display: flex; gap: 0.45rem; padding: 0.75rem; border-top: 1px solid var(--border-hair); }
+    .drawer-form input {
+      flex: 1; background: rgba(3, 7, 18, 0.8); border: 1px solid var(--border-hair);
+      border-radius: 9px; color: #fff; padding: 0.5rem 0.75rem; font-size: 0.82rem; outline: none;
+    }
+    .drawer-form input:focus { border-color: var(--gold); }
+
+    /* Modals */
+    .modal-bg {
+      position: fixed; inset: 0; z-index: 1200; background: rgba(2, 6, 17, 0.82); backdrop-filter: blur(12px);
+      display: none; align-items: center; justify-content: center; padding: 1.25rem;
+    }
+    .modal-bg.open { display: flex; }
+    .modal-panel {
+      width: min(860px, 100%); max-height: 90vh; overflow-y: auto;
+      background: rgba(7, 14, 34, 0.96); border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.82); border-radius: 20px; padding: 1.9rem; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px;
+      border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-hair); color: #fff;
+    }
+    .studio-tabs { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 1rem 0 1.25rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border-hair); }
+    .s-tab {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-hair);
+      color: var(--text-secondary); padding: 0.42rem 0.88rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.74rem;
+    }
+    .s-tab.active { background: rgba(212, 175, 55, 0.12); border-color: var(--border-gold); color: var(--gold-light); }
+    .fg { margin-bottom: 0.95rem; }
+    .fg label { display: block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--sapphire-soft); margin-bottom: 0.32rem; }
+    .fg input, .fg textarea, .fg select {
+      width: 100%; background: rgba(3, 7, 18, 0.85); border: 1px solid var(--border-hair);
+      border-radius: 9px; color: #f8fafc; padding: 0.6rem 0.8rem; font-family: var(--font-sans); font-size: 0.86rem; outline: none;
+    }
+    .fg input:focus, .fg textarea:focus, .fg select:focus { border-color: var(--gold); }
+    .s-box { background: rgba(4, 9, 22, 0.62); border: 1px solid var(--border-hair); border-radius: 13px; padding: 1rem; margin-bottom: 1rem; }
+
+    footer {
+      border-top: 1px solid var(--border-hair); padding: 2.3rem 0 5.4rem;
+      margin-top: 4.5rem; background: rgba(3, 7, 18, 0.7); backdrop-filter: blur(18px);
+    }
+    .foot-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+
+    @media (max-width: 960px) {
+      .hero-grid, .showcase-grid, .grid-3, .grid-2, .stage-flow { grid-template-columns: 1fr; }
+      nav ul {
+        display: none; position: absolute; top: calc(100% + 0.6rem); left: 0; right: 0;
+        background: rgba(7, 14, 34, 0.96); border: 1px solid var(--border-hair);
+        border-radius: 14px; flex-direction: column; padding: 0.75rem;
+      }
+      nav ul.open { display: flex; }
+      .mobile-btn { display: inline-flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Compact Red Glassmorphism Cursor + Golden Yellow Outer Luminescence -->
+  <canvas id="cursor-canvas"></canvas>
+  <div id="cursor-lens"></div>
+  <div id="cursor-tag"></div>
+
+  <!-- Live Custom GLSL Shader 3D Liquid Sapphire & Gold Contour Surface -->
+  <canvas id="bg-3d"></canvas>
+  <div class="atmosphere"></div>
+
+  <!-- High-Craft 3D Rover Bot ("Eon") -->
+  <canvas id="bot-3d-canvas"></canvas>
+  <div id="bot-hitbox" data-cursor="DRAG EON"></div>
+  <div id="bot-whisper"></div>
+
+  <!-- Editorial Top Navigation -->
+  <header class="topbar">
+    <a href="#overview" class="brand" data-cursor="TOP">
+      <div class="brand-mark">Ps</div>
+      <span class="brand-name" id="nav-name">Prajin S</span>
+    </a>
+
+    <nav>
+      <ul id="nav-list">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#background">Background</a></li>
+        <li><a href="#capabilities">Capabilities</a></li>
+        <li><a href="#credentials">Credentials</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-cta">
+      <button class="btn-ghost" onclick="toggleDrawer(true)" data-cursor="ASK EON">Eon</button>
+      <button class="mobile-btn" onclick="document.getElementById('nav-list').classList.toggle('open')">Menu</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <!-- OVERVIEW -->
+    <section id="overview" class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <span class="index-label" id="hero-kicker">AI &amp; Data Science — Velalar CET</span>
+            <h1 class="hero-name" id="hero-name">Prajin <em>Shanmugaraj</em></h1>
+            <p class="hero-lead" id="hero-role">
+              Designing <span>intelligent systems</span> across computer vision, automated analytics, and applied machine learning.
+            </p>
+            <p class="hero-bio" id="hero-summary"></p>
+
+            <div class="hero-ctas">
+              <a href="#projects" class="btn-primary" data-cursor="VIEW WORK">Selected Projects</a>
+              <a href="#contact" class="btn-outline" data-cursor="CONTACT">Initiate Contact</a>
+              <button class="btn-outline" onclick="openDossier()" data-cursor="DOSSIER">Curriculum Vitae</button>
+            </div>
+
+            <div class="metrics-strip">
+              <div class="metric">
+                <strong id="m-cgpa">7.8</strong>
+                <span>CGPA / 6th Sem</span>
+              </div>
+              <div class="metric">
+                <strong id="m-hsc">81.33%</strong>
+                <span>HSC Distinction</span>
+              </div>
+              <div class="metric">
+                <strong id="m-loc">Erode</strong>
+                <span>Tamil Nadu, IN</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="portrait-wrap">
+            <div class="portrait-card" id="portrait-card" data-cursor="PRAJIN S">
+              <div class="portrait-frame" id="portrait-frame"></div>
+              <div class="portrait-caption">
+                <strong id="card-name">Prajin S</strong>
+                <span>AI &amp; DATA SCIENCE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CURATED PROJECTS -->
+    <section id="projects" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="index-label">01 / Selected Engineering</span>
+            <h2 class="section-title">Featured <em>Productions</em></h2>
+          </div>
+          <p class="section-desc">Curated systems engineered across fitness intelligence, adaptive 5G video, automated hiring, and active AI prototyping.</p>
+        </div>
+
+        <div class="showcase-grid reveal">
+          <div class="showcase-index" id="project-rail"></div>
+          <div class="glass showcase-stage" id="project-stage" data-cursor="BLUEPRINT"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BACKGROUND -->
+    <section id="background" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="index-label">02 / Academic &amp; Field Record</span>
+            <h2 class="section-title">Education &amp; <em>Experience</em></h2>
+          </div>
+          <p class="section-desc">Engineering foundations paired with practical Python and Pandas data workflow automation.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="glass glass-hover pad reveal">
+            <h3 style="font-size:1.08rem; font-weight:600; color:var(--gold-light); margin-bottom:1.3rem;">Academic Trajectory</h3>
+            <div class="timeline" id="edu-list"></div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:1.5rem;">
+            <div class="glass glass-hover pad reveal">
+              <h3 style="font-size:1.08rem; font-weight:600; color:var(--sapphire-soft); margin-bottom:1.2rem;">Industry Internship</h3>
+              <div class="timeline" id="intern-list"></div>
+            </div>
+
+            <div class="glass glass-hover pad reveal">
+              <h3 style="font-size:1.04rem; font-weight:600; margin-bottom:0.45rem;">Collaborative Attributes</h3>
+              <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.85rem;">Demonstrated across 24-hour hackathons, paper presentations, and technical volunteering.</p>
+              <div class="tag-row" id="soft-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAPABILITIES & PIXEL-ALIGNED CONNECTED PROFILES -->
+    <section id="capabilities" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="index-label">03 / Stack &amp; Connected Profiles</span>
+            <h2 class="section-title">Technical <em>Capabilities</em></h2>
+          </div>
+          <p class="section-desc">Live metrics synchronized directly from GitHub and LeetCode alongside core data tooling.</p>
+        </div>
+
+        <div class="grid-3 reveal" style="margin-bottom:1.5rem;" id="skills-grid"></div>
+
+        <div class="grid-3 reveal">
+          <div class="glass glass-hover profile-card">
+            <div class="profile-card-top">
+              <span class="profile-card-kicker">GITHUB — LIVE API</span>
+              <span class="profile-card-status" id="gh-status-pill">SYNCING</span>
+            </div>
+            <h3 class="profile-card-title" id="gh-handle">@PrajinShan</h3>
+            <p class="profile-card-desc" id="gh-bio">Synchronizing public repositories...</p>
+            <div class="stat-trio">
+              <div class="stat-box"><strong id="gh-repos">--</strong><span>REPOS</span></div>
+              <div class="stat-box"><strong id="gh-followers">--</strong><span>FOLLOWERS</span></div>
+              <div class="stat-box"><strong id="gh-stars">--</strong><span>STARS</span></div>
+            </div>
+            <a id="gh-link" href="https://github.com/PrajinShan" target="_blank" rel="noopener" class="btn-outline profile-card-cta" data-cursor="GITHUB">Open GitHub</a>
+          </div>
+
+          <div class="glass glass-hover profile-card">
+            <div class="profile-card-top">
+              <span class="profile-card-kicker">LEETCODE — LIVE SYNC</span>
+              <span class="profile-card-status" id="lc-status-pill">CONNECTING</span>
+            </div>
+            <h3 class="profile-card-title" id="lc-handle">@prajin_s7</h3>
+            <p class="profile-card-desc" id="lc-bio">Fetching solved problems &amp; rank...</p>
+            <div class="stat-trio">
+              <div class="stat-box"><strong id="lc-total">--</strong><span>SOLVED</span></div>
+              <div class="stat-box"><strong id="lc-easy">--</strong><span>EASY</span></div>
+              <div class="stat-box"><strong id="lc-med">--</strong><span>MED / HARD</span></div>
+            </div>
+            <a id="lc-link" href="https://leetcode.com/u/prajin_s7/" target="_blank" rel="noopener" class="btn-outline profile-card-cta" data-cursor="LEETCODE">Open LeetCode</a>
+          </div>
+
+          <div class="glass glass-hover profile-card">
+            <div class="profile-card-top">
+              <span class="profile-card-kicker" style="color:var(--gold-light);">LINKEDIN — NETWORK</span>
+              <span class="profile-card-status">VERIFIED</span>
+            </div>
+            <h3 class="profile-card-title" id="li-handle">/in/prajin-shan</h3>
+            <p class="profile-card-desc">Engineering updates, hackathon milestones, and AI &amp; Data Science network.</p>
+            <div class="stat-trio">
+              <div class="stat-box"><strong style="font-size:0.95rem;">AI / DS</strong><span>DOMAIN</span></div>
+              <div class="stat-box"><strong style="font-size:0.95rem;">2026</strong><span>GRAD</span></div>
+              <div class="stat-box"><strong style="font-size:0.95rem;">OPEN</strong><span>TO ROLES</span></div>
+            </div>
+            <a id="li-link" href="https://www.linkedin.com/in/prajin-shan/" target="_blank" rel="noopener" class="btn-primary profile-card-cta" data-cursor="LINKEDIN">View LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CREDENTIALS -->
+    <section id="credentials" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="index-label">04 / Verified Credentials</span>
+            <h2 class="section-title">Certifications &amp; <em>Distinctions</em></h2>
+          </div>
+          <p class="section-desc">NPTEL, IIT Bombay Spoken Tutorial, 5G Hackathon, Project Expos, and paper presentations.</p>
+        </div>
+
+        <div class="filters reveal">
+          <button class="f-btn active" onclick="filterCreds('all', this)">All</button>
+          <button class="f-btn" onclick="filterCreds('cert', this)">Certifications</button>
+          <button class="f-btn" onclick="filterCreds('participation', this)">Hackathons &amp; Papers</button>
+          <button class="f-btn" onclick="filterCreds('extra', this)">Volunteering &amp; Media</button>
+        </div>
+
+        <div class="grid-3 reveal" id="creds-grid"></div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="index-label">05 / Direct Correspondence</span>
+            <h2 class="section-title">Start a <em>Conversation</em></h2>
+          </div>
+          <p class="section-desc">Open to AI engineering, data analytics, and software development opportunities.</p>
+        </div>
+
+        <div class="grid-2 reveal">
+          <div class="glass pad">
+            <h3 style="font-size:1.08rem; font-weight:600; color:var(--gold-light); margin-bottom:1.15rem;">Direct Channels</h3>
+            <div style="display:flex; flex-direction:column; gap:0.8rem;">
+              <div class="s-box" style="margin:0; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <span style="font-family:var(--font-mono); font-size:0.64rem; color:var(--sapphire-soft);">EMAIL</span>
+                  <div id="c-email" style="font-size:0.93rem;">prajin.shanmugaraj@gmail.com</div>
+                </div>
+                <button class="f-btn" onclick="copyContact('email')">Copy</button>
+              </div>
+              <div class="s-box" style="margin:0; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <span style="font-family:var(--font-mono); font-size:0.64rem; color:var(--sapphire-soft);">TELEPHONE</span>
+                  <div id="c-phone" style="font-size:0.93rem;">+91 9884430666</div>
+                </div>
+                <button class="f-btn" onclick="copyContact('phone')">Copy</button>
+              </div>
+              <div class="s-box" style="margin:0; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <span style="font-family:var(--font-mono); font-size:0.64rem; color:var(--sapphire-soft);">LOCATION</span>
+                  <div id="c-loc" style="font-size:0.93rem;">Erode, India</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="glass pad">
+            <h3 style="font-size:1.08rem; font-weight:600; color:var(--sapphire-soft); margin-bottom:1rem;">Send a Message</h3>
+            <form onsubmit="submitMail(event)" style="display:flex; flex-direction:column; gap:0.85rem;">
+              <div class="fg" style="margin:0;"><label>NAME / ORGANIZATION</label><input id="m-name" required placeholder="Your name or company" /></div>
+              <div class="fg" style="margin:0;"><label>MESSAGE</label><textarea id="m-body" rows="3" required placeholder="Role, collaboration, or project inquiry..."></textarea></div>
+              <button type="submit" class="btn-primary" style="justify-content:center;">Send Email</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container foot-row">
+      <div>
+        <strong style="font-size:0.9rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold-light);">Prajin S</strong>
+        <span style="font-size:0.8rem; color:var(--text-muted); margin-left:0.65rem;">© 2026 — AI &amp; Data Science</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+        <button class="f-btn" onclick="toggleBotPatrol()">Eon Patrol: <span id="walk-flag">Active</span></button>
+        <button class="f-btn" style="border-color:var(--border-gold); color:var(--gold-light);" onclick="openOwnerAuth()" data-cursor="OWNER ONLY">Owner Studio</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Eon AI Drawer -->
+  <div id="ai-drawer">
+    <div class="drawer-top">
+      <div>
+        <strong style="font-size:0.9rem; color:var(--gold-light);">Eon</strong>
+        <div style="font-family:var(--font-mono); font-size:0.62rem; color:var(--sapphire-soft);">PORTFOLIO ASSISTANT</div>
+      </div>
+      <button onclick="toggleDrawer(false)" style="background:none; border:none; color:var(--text-secondary); font-size:1rem;">✕</button>
+    </div>
+    <div class="drawer-log" id="drawer-log"></div>
+    <div class="drawer-prompts">
+      <button class="d-chip" onclick="askEon('Tell me about Fit Surfer, CCTV & Screenly')">Projects</button>
+      <button class="d-chip" onclick="askEon('What is Pathwise Companion?')">Pathwise</button>
+      <button class="d-chip" onclick="askEon('Education & Internship')">Background</button>
+      <button class="d-chip" onclick="askEon('Technical skills')">Skills</button>
+      <button class="d-chip" onclick="askEon('Contact details')">Contact</button>
+    </div>
+    <form class="drawer-form" onsubmit="handleEonSubmit(event)">
+      <input type="text" id="eon-in" placeholder="Ask Eon about Prajin's work..." autocomplete="off" />
+      <button type="submit" class="btn-primary" style="padding:0.45rem 0.85rem; font-size:0.78rem;">Send</button>
+    </form>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal-bg" id="dossier-modal">
+    <div class="modal-panel">
+      <button class="modal-close" onclick="closeModal('dossier-modal')">✕</button>
+      <div id="dossier-body"></div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="studio-modal">
+    <div class="modal-panel">
+      <button class="modal-close" onclick="closeModal('studio-modal')">✕</button>
+      <div id="studio-body"></div>
+    </div>
+  </div>
+
+  <script>
+    /*__HASH_START__*/
+    const DEFAULT_PASS_HASH = "85080f5ca5d1549a03a3045cf6f75c41d3c7583234c75b01fb64d8aae6a4aefa";
+    /*__HASH_END__*/
+
+    /*__DATA_START__*/
+    const DEFAULT_DATA = {
+  "profile": {
+    "name": "Prajin S",
+    "kicker": "AI & Data Science — VCET",
+    "role": "Designing intelligent systems across computer vision, automated analytics, and applied machine learning.",
+    "summary": "Final-year Artificial Intelligence and Data Science student focused on turning raw data into clear, reliable decisions. Experienced in Python automation, computer vision analytics, and full-cycle AI prototyping.",
+    "photoDataUrl": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAQDAwMDAgQDAwMEBAQFBgoGBgUFBgwICQcKDgwPDg4MDQ0PERYTDxAVEQ0NExoTFRcYGRkZDxIbHRsYHRYYGRj/2wBDAQQEBAYFBgsGBgsYEA0QGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBj/wAARCAIwAaQDASIAAhEBAxEB/8QAHQABAAAHAQEAAAAAAAAAAAAAAAECAwQFBwgGCf/EAEoQAAEDAgUBBgMFBgMGBAUFAAEAAgMEEQUGEiExQQcTIlFhcQiBkRQyocHwFSNCUrHRJGJyFkOCkuHxM3OishclNKOzJkRTwtL/xAAbAQEAAgMBAQAAAAAAAAAAAAAAAQMCBAUGB//EAC0RAQACAgICAQQBAwMFAAAAAAABAgMRBCESMQUTIkFRMhQVcSNhsTNCgZHB/9oADAMBAAIRAxEAPwDvxERAToiICJ0RAREQE4CeqICIiB0TonVEBL3REBERAPCIiByiIgdd0ROiAidEHKB1ROqICIiAnCIgbIiICIiB0REQOqeyIgIiICId0QByiJ1QEREBET2QR9FBEQEREBEsiAiIgdU6ogvZAREQERR6IIe6IiAiJ80BOUTogIE8k9ECyIiAiJ7ICFAiAiIgIiICdUTqgIiICIiAiIgJ0ToiBzwiJ0QEUVDogdETpdEBERARNkQEREDqie6cbICIiB80uiICIiAiIgIiICJ0TogJfZEQE6cIFHoghwifNEC+/CIiAiIgdUREAoiICiodE9EBOiIgIiICIiAiIgeyIiB0REQCidEQECHlEDhNkT3QET1RAtwieqICcpbZEDqiIgIiICdEsiAnVEQEREBE6ogIiICIiAiIgJuiICIiAiIgboE45RAREQE6oiAiIgdEREBE6ogIiICeyJ1QEREBOiIgBETogIiICIiAidE6IHSyIiAiJ1QEUfoiCCFOnCIHRERAREQPZERAREQE5REBERAREP6CAiIgInHKICIlkBERAQ8ohQEREDpsg53REBOqJugIiICJZEBERAREQEREBERAREQE6p80QE6bonKAiIgDhEsiAiIgKKh1RAREQEROqAnROqICIiAidUQOidERAROqICbIiAiIgIiW2QESyICIo9LoIIiICIiAiIgBOiJZAREQEREBERAREQNkREBFFQQEREBERARPdEBERA6oiIHuiIgIiIHKIiAiIggooiAiIgIm6BARFY4ljGHYVTumrqlkTQQ2x5uSALDrckD5oL5CQBclc8dtHxU5a7N6A4bgogxTMEpextOX+Cn03BdJbpfgA72K5Yrvi/7XxDUQRZgiHeBoYHUkRc0cmxa0c+fNuqjbKK7fQfOGf8s5IytU47j+JNpqaC4sWkveRtZrdi7ewuNt+VzBmP46cPoMztiwPLrK/DWEB41O71+5GzrgN2sRs6/FwuOcy59ztn0y1WZMbq5y7a8zyI2g8lrBsNzvYc78ryM1QMNh7mleZ6h7QwuYy+++/t5KNp1EPpbR/FnkrMFHQT4NX09DUj97V0uJPEbSLWMTZDtr3Dgb6djc+Vzlf4rchY/iVY7EsXoMDpaWPUIqxx76d92/dtsQBqFhe/O1l8xoaualg76ebvi4/cc6+/kq0cmKskfO9rYo9GoNsDsfLqm5NQ+oFX8WfZTTVD4osQqalrWB3eQRa9ZIuGtA5O+97W677Lz1N8ZuQ3SMmxCCopKY3uwR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",
+    "cgpa": "7.8",
+    "hsc": "81.33%",
+    "location": "Erode, India",
+    "email": "prajin.shanmugaraj@gmail.com",
+    "phone": "+91 9884430666",
+    "githubUsername": "PrajinShan",
+    "leetcodeUsername": "prajin_s7",
+    "leetcodeFallback": {
+      "total": "",
+      "easy": "",
+      "medHard": "",
+      "note": "Snapshot configured in Owner Studio."
+    },
+    "linkedinHandle": "prajin-shan"
+  },
+  "projects": [
+    {
+      "id": "fit-surfer",
+      "status": "Production / Repository",
+      "inDevelopment": false,
+      "repoKeywords": [
+        "fit",
+        "surfer",
+        "fitsurfer"
+      ],
+      "title": "Fit Surfer",
+      "subtitle": "Interactive Fitness & Activity Intelligence",
+      "summary": "Structured fitness and activity companion designed to make daily workout tracking, consistency, and wellness insights intuitive.",
+      "highlights": [
+        "Engineered streamlined activity tracking and guided workout workflows.",
+        "Automatically links live GitHub repository telemetry and primary stack metrics.",
+        "Built with a clean modular architecture adaptable to data-driven progress tracking."
+      ],
+      "flow": [
+        {
+          "step": "01 / INPUT",
+          "label": "Session & Activity Logs"
+        },
+        {
+          "step": "02 / ENGINE",
+          "label": "Progress & Habit Logic"
+        },
+        {
+          "step": "03 / VIEW",
+          "label": "Actionable Wellness Metrics"
+        }
+      ],
+      "tech": [
+        "Python / Web",
+        "Activity Analytics",
+        "Modular UI"
+      ]
+    },
+    {
+      "id": "cctv-adaptive",
+      "status": "VIT 5G Hackathon",
+      "inDevelopment": false,
+      "repoKeywords": [
+        "cctv",
+        "adaptive",
+        "video"
+      ],
+      "title": "CCTV Adaptive Video Analytics",
+      "subtitle": "Real-Time Scene-Density Resolution & Bandwidth Optimization",
+      "summary": "Engineered during the VIT Chennai 24-Hour 5G Hackathon to allocate video clarity strictly where scene activity demands it.",
+      "highlights": [
+        "Switches automatically to high resolution for crowded scenes and low resolution for empty frames, conserving compute.",
+        "Modulates stream quality in real time to cut network payload, preventing slowdowns while preserving critical footage."
+      ],
+      "flow": [
+        {
+          "step": "01 / CAPTURE",
+          "label": "Live Surveillance Feed"
+        },
+        {
+          "step": "02 / VISION",
+          "label": "Crowd Density Analysis"
+        },
+        {
+          "step": "03 / ADAPT",
+          "label": "Dynamic High/Low Bitrate"
+        }
+      ],
+      "tech": [
+        "Python",
+        "Computer Vision",
+        "Adaptive Bitrate",
+        "5G Edge"
+      ]
+    },
+    {
+      "id": "screenly-ai",
+      "status": "AI Platform",
+      "inDevelopment": true,
+      "repoKeywords": [
+        "screenly"
+      ],
+      "title": "Screenly AI",
+      "subtitle": "AI-Powered Recruitment, Assessment & Proctoring Suite",
+      "summary": "End-to-end automated candidate evaluation platform combining resume-to-JD skill ranking with computer vision assessment proctoring.",
+      "highlights": [
+        "Developed an AI resume screening engine matching candidate competencies with job descriptions to rank job fit.",
+        "Implemented automated technical assessments paired with computer vision-based proctoring to monitor sessions."
+      ],
+      "flow": [
+        {
+          "step": "01 / PARSE",
+          "label": "Resume & JD Extraction"
+        },
+        {
+          "step": "02 / SCORE",
+          "label": "AI Job-Fit Ranking"
+        },
+        {
+          "step": "03 / PROCTOR",
+          "label": "CV Session Monitoring"
+        }
+      ],
+      "tech": [
+        "Python",
+        "NLP / Matching",
+        "Computer Vision",
+        "Automated Proctoring"
+      ]
+    },
+    {
+      "id": "pathwise-companion",
+      "status": "In Development",
+      "inDevelopment": true,
+      "repoKeywords": [
+        "pathwise",
+        "ai",
+        "ai tutor"
+      ],
+      "title": "Pathwise Companion",
+      "subtitle": "Adaptive Guidance & Progression Assistant (In Development)",
+      "summary": "Currently in active development—crafting an intelligent companion focused on structured learning roadmaps, goal tracking, and contextual recommendations.",
+      "highlights": [
+        "Active development phase with iterative architecture and repository evolution.",
+        "Designed around adaptive progression milestones and personalized AI assistance."
+      ],
+      "flow": [
+        {
+          "step": "01 / CONTEXT",
+          "label": "Goal & State Modeling"
+        },
+        {
+          "step": "02 / PLANNER",
+          "label": "Adaptive Pathing (WIP)"
+        },
+        {
+          "step": "03 / GUIDE",
+          "label": "Companion Assistance"
+        }
+      ],
+      "tech": [
+        "In Development",
+        "AI Assistant",
+        "Python / Modeling"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Tech Artificial Intelligence and Data Science",
+      "school": "Velalar College of Engineering and Technology",
+      "period": "Upto 6th Sem",
+      "score": "CGPA: 7.8"
+    },
+    {
+      "degree": "Higher Secondary Certificate (HSC)",
+      "school": "Bharathi Vidyalaya Matriculation Higher Secondary School",
+      "period": "2023",
+      "score": "81.33%"
+    },
+    {
+      "degree": "Secondary School Leaving Certificate (SSLC)",
+      "school": "Bharathi Vidyalaya Matriculation Higher Secondary School",
+      "period": "2021",
+      "score": "Pass"
+    }
+  ],
+  "internships": [
+    {
+      "role": "Data Scientist — Intern",
+      "period": "2 Weeks • Dec 2024",
+      "description": "Applied core data science principles to clean and analyze data using Pandas and Python, focusing on workflow automation for speed and efficiency."
+    }
+  ],
+  "skills": {
+    "languages": [
+      {
+        "name": "Python",
+        "level": 82
+      },
+      {
+        "name": "Java",
+        "level": 84
+      },
+      {
+        "name": "SQL",
+        "level": 80
+      }
+    ],
+    "tools": [
+      "Git",
+      "GitHub",
+      "VS Code",
+      "Tableau",
+      "Power BI"
+    ],
+    "frameworks": [
+      "Pandas",
+      "NumPy",
+      "Computer Vision",
+      "Data Automation",
+      "SciKit Learn"
+    ],
+    "softSkills": [
+      "Problem Solving",
+      "Critical Thinking",
+      "Adaptability",
+      "Team Collaboration",
+      "Time Management"
+    ]
+  },
+  "honors": [
+    {
+      "category": "cert",
+      "badge": "NPTEL",
+      "title": "Cloud Computing",
+      "detail": "Certified coursework in cloud architecture, virtualization, and distributed services."
+    },
+    {
+      "category": "cert",
+      "badge": "NPTEL",
+      "title": "Industry 4.0 & Industrial IoT",
+      "detail": "Certified training in smart industrial automation and connected IoT ecosystems."
+    },
+    {
+      "category": "cert",
+      "badge": "IIT BOMBAY",
+      "title": "Python 3.4.3 & Java Training",
+      "detail": "Spoken Tutorial certification developed at IIT Bombay."
+    },
+    {
+      "category": "cert",
+      "badge": "HACKERRANK",
+      "title": "Problem Solving (Basic)",
+      "detail": "Verified algorithmic and logic assessment credential."
+    },
+    {
+      "category": "participation",
+      "badge": "24H HACKATHON",
+      "title": "VIT Chennai — 5G Hackathon",
+      "detail": "Engineered Adaptive CCTV Video Analytics over a 24-hour intensive build."
+    },
+    {
+      "category": "participation",
+      "badge": "PROJECT EXPO",
+      "title": "VCET Expo 2K25 — Deepfake Detection",
+      "detail": "Demonstrated Deepfake Detection system at Velalar CET."
+    },
+    {
+      "category": "participation",
+      "badge": "PAPER PRESENTATION",
+      "title": "FIESTAA '25 & KNACK '25",
+      "detail": "Presented papers on Game Theory (KPRIET) and Gen-AI (VCET)."
+    },
+    {
+      "category": "participation",
+      "badge": "WORKSHOPS",
+      "title": "Robotics & Power BI Analytics",
+      "detail": "Attended technical workshops at KPRIET (FIESTAA '25) and Nandha Engineering College (SYNETICS '25)."
+    },
+    {
+      "category": "extra",
+      "badge": "VOLUNTEERING",
+      "title": "PALS innoWAH! Pre-Finals",
+      "detail": "Student Volunteer supporting coordination for the PALS innovation pre-finals."
+    },
+    {
+      "category": "extra",
+      "badge": "CREATIVE",
+      "title": "Digital Content Creation",
+      "detail": "Designing structured technical and visual digital media."
+    }
+  ]
+};
+    /*__DATA_END__*/
+
+    const CLEAN_SNAPSHOT = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const DATA_KEY = "prajin_arch_portfolio_v6";
+    const HASH_KEY = "prajin_arch_hash_v6";
+
+    let state = loadState();
+    let activeProjectIdx = 0;
+    let activeCredFilter = "all";
+    let studioUnlocked = false;
+    let ghRepos = [];
+
+    function loadState() {
+      try {
+        const s = localStorage.getItem(DATA_KEY);
+        if (s) return JSON.parse(s);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+    function getPassHash() { return localStorage.getItem(HASH_KEY) || DEFAULT_PASS_HASH; }
+    function esc(v) {
+      return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    /* Pure-JS SHA-256 (works reliably across file://, http://, https://) */
+    function sha256Sync(str) {
+      const primes = [
+        2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,
+        137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311
+      ];
+      const frac32 = x => ((x % 1) * 0x100000000) >>> 0;
+      const H = primes.slice(0, 8).map(p => frac32(Math.sqrt(p)));
+      const K = primes.map(p => frac32(Math.cbrt(p)));
+      const bytes = Array.from(new TextEncoder().encode(str));
+      const bitLen = bytes.length * 8;
+      bytes.push(0x80);
+      while (bytes.length % 64 !== 56) bytes.push(0);
+      const hi = Math.floor(bitLen / 0x100000000), lo = bitLen >>> 0;
+      for (let i = 3; i >= 0; i--) bytes.push((hi >>> (i * 8)) & 0xff);
+      for (let i = 3; i >= 0; i--) bytes.push((lo >>> (i * 8)) & 0xff);
+
+      const rr = (v, n) => (v >>> n) | (v << (32 - n));
+      const w = new Uint32Array(64);
+      for (let off = 0; off < bytes.length; off += 64) {
+        for (let i = 0; i < 16; i++) {
+          w[i] = (bytes[off + i * 4] << 24) | (bytes[off + i * 4 + 1] << 16) | (bytes[off + i * 4 + 2] << 8) | bytes[off + i * 4 + 3];
+        }
+        for (let i = 16; i < 64; i++) {
+          const s0 = rr(w[i - 15], 7) ^ rr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+          const s1 = rr(w[i - 2], 17) ^ rr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+          w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0;
+        }
+        let [a, b, c, d, e, f, g, h] = H;
+        for (let i = 0; i < 64; i++) {
+          const S1 = rr(e, 6) ^ rr(e, 11) ^ rr(e, 25);
+          const ch = (e & f) ^ (~e & g);
+          const t1 = (h + S1 + ch + K[i] + w[i]) >>> 0;
+          const S0 = rr(a, 2) ^ rr(a, 13) ^ rr(a, 22);
+          const maj = (a & b) ^ (a & c) ^ (b & c);
+          const t2 = (S0 + maj) >>> 0;
+          h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+        }
+        const vals = [a, b, c, d, e, f, g, h];
+        for (let i = 0; i < 8; i++) H[i] = (H[i] + vals[i]) >>> 0;
+      }
+      return H.map(x => x.toString(16).padStart(8, "0")).join("");
+    }
+
+    function renderAll() {
+      const p = state.profile;
+      document.getElementById("nav-name").textContent = p.name;
+      document.getElementById("hero-kicker").textContent = p.kicker;
+
+      const parts = p.name.trim().split(" ");
+      document.getElementById("hero-name").innerHTML = parts.length > 1
+        ? `${esc(parts[0])} <em>${esc(parts.slice(1).join(" "))}</em>`
+        : esc(p.name);
+
+      document.getElementById("hero-role").innerHTML = esc(p.role).replace("intelligent systems", "<span>intelligent systems</span>");
+      document.getElementById("hero-summary").textContent = p.summary;
+      document.getElementById("m-cgpa").textContent = p.cgpa;
+      document.getElementById("m-hsc").textContent = p.hsc;
+      document.getElementById("m-loc").textContent = p.location.split(",")[0];
+      document.getElementById("card-name").textContent = p.name;
+
+      const frame = document.getElementById("portrait-frame");
+      if (p.photoDataUrl) {
+        frame.innerHTML = `<img src="${esc(p.photoDataUrl)}" alt="${esc(p.name)}" />`;
+      } else {
+        frame.innerHTML = `
+          <img src="prajin.jpg" alt="${esc(p.name)}"
+               onerror="if(!this.dataset.t){this.dataset.t='1';this.src='profile.jpg';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}" />
+          <div class="portrait-placeholder" style="display:none;">
+            <div class="portrait-initials">Ps</div>
+            <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-secondary); line-height:1.5;">
+              Place <strong>prajin.jpg</strong> beside this file or upload your portrait in <strong>Owner Studio</strong>.
+            </p>
+          </div>`;
+      }
+
+      renderProjects();
+
+      document.getElementById("edu-list").innerHTML = state.education.map(e => `
+        <div class="t-node">
+          <div class="t-top"><span>${esc(e.period)}</span><span style="color:var(--sapphire-soft);">${esc(e.score)}</span></div>
+          <strong style="display:block; font-size:0.98rem; font-weight:600;">${esc(e.degree)}</strong>
+          <span style="font-size:0.85rem; color:var(--text-secondary);">${esc(e.school)}</span>
+        </div>
+      `).join("");
+
+      document.getElementById("intern-list").innerHTML = state.internships.map(i => `
+        <div class="t-node">
+          <div class="t-top"><span>${esc(i.period)}</span></div>
+          <strong style="display:block; font-size:0.98rem; font-weight:600;">${esc(i.role)}</strong>
+          <p style="font-size:0.87rem; color:#cbd5e1; margin-top:0.3rem;">${esc(i.description)}</p>
+        </div>
+      `).join("");
+
+      document.getElementById("soft-list").innerHTML = state.skills.softSkills.map(s => `<span class="tag gold">${esc(s)}</span>`).join("");
+
+      const sk = state.skills;
+      document.getElementById("skills-grid").innerHTML = `
+        <div class="glass glass-hover pad">
+          <span style="font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.12em; color:var(--gold-light);">01 / LANGUAGES</span>
+          <h3 style="font-size:1.08rem; margin:0.3rem 0 1.05rem;">Core Programming</h3>
+          ${sk.languages.map(l => `
+            <div class="sk-row">
+              <div class="sk-head"><span>${esc(l.name)}</span><span style="font-family:var(--font-mono); color:var(--gold-light);">${l.level}%</span></div>
+              <div class="sk-track"><div class="sk-fill" style="width:${l.level}%"></div></div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="glass glass-hover pad">
+          <span style="font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.12em; color:var(--gold-light);">02 / TOOLING &amp; BI</span>
+          <h3 style="font-size:1.08rem; margin:0.3rem 0 0.5rem;">Platforms &amp; Analytics</h3>
+          <p style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:0.9rem;">Collaborative version control and interactive visualization tools.</p>
+          <div class="tag-row">${sk.tools.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+        </div>
+        <div class="glass glass-hover pad">
+          <span style="font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.12em; color:var(--gold-light);">03 / DATA &amp; AI</span>
+          <h3 style="font-size:1.08rem; margin:0.3rem 0 0.5rem;">Libraries &amp; Domains</h3>
+          <p style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:0.9rem;">Data manipulation, numerical computing, and applied vision.</p>
+          <div class="tag-row">${sk.frameworks.map(f => `<span class="tag gold">${esc(f)}</span>`).join("")}</div>
+        </div>
+      `;
+
+      renderCreds();
+
+      document.getElementById("c-email").textContent = p.email;
+      document.getElementById("c-phone").textContent = p.phone;
+      document.getElementById("c-loc").textContent = p.location;
+      document.getElementById("gh-handle").textContent = "@" + p.githubUsername;
+      document.getElementById("gh-link").href = `https://github.com/${encodeURIComponent(p.githubUsername)}`;
+      document.getElementById("lc-handle").textContent = "@" + p.leetcodeUsername;
+      document.getElementById("lc-link").href = `https://leetcode.com/u/${encodeURIComponent(p.leetcodeUsername)}/`;
+      document.getElementById("li-handle").textContent = "/in/" + p.linkedinHandle;
+      document.getElementById("li-link").href = `https://www.linkedin.com/in/${encodeURIComponent(p.linkedinHandle)}/`;
+    }
+
+    function matchRepo(proj) {
+      if (!ghRepos.length) return null;
+      const kws = (proj.repoKeywords || []).map(k => k.toLowerCase());
+      return ghRepos.find(r => {
+        const hay = `${r.name} ${r.description || ""}`.toLowerCase();
+        return kws.some(k => hay.includes(k));
+      }) || null;
+    }
+
+    function renderProjects() {
+      document.getElementById("project-rail").innerHTML = state.projects.map((pr, i) => `
+        <button class="proj-tab ${i === activeProjectIdx ? "active" : ""}" onclick="selectProject(${i})" data-cursor="OPEN 0${i + 1}">
+          <div class="proj-tab-meta ${pr.inDevelopment ? "dev" : ""}">
+            <span>0${i + 1}</span><span>${esc(pr.status)}</span>
+          </div>
+          <div class="proj-tab-name">${esc(pr.title)}</div>
+          <div class="proj-tab-sub">${esc(pr.subtitle)}</div>
+        </button>
+      `).join("");
+
+      const pr = state.projects[activeProjectIdx] || state.projects[0];
+      const repo = matchRepo(pr);
+      const ghRow = repo ? `
+        <div class="gh-inspect-bar">
+          <div>
+            <div style="font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.12em; color:var(--gold-light);">GITHUB SOURCE DETECTED</div>
+            <div style="font-size:0.86rem; color:#e2e8f0;">
+              <strong>${esc(repo.name)}</strong> — ${esc(repo.language || "Codebase")} • ${repo.stargazers_count} stars • Updated ${new Date(repo.updated_at).toLocaleDateString()}
+            </div>
+          </div>
+          <a href="${esc(repo.html_url)}" target="_blank" rel="noopener" class="btn-ghost" data-cursor="SOURCE">View Repository</a>
+        </div>
+      ` : `
+        <div class="gh-inspect-bar">
+          <div>
+            <div style="font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.12em; color:var(--sapphire-soft);">SOURCE REFERENCE</div>
+            <div style="font-size:0.84rem; color:var(--text-secondary);">
+              ${pr.inDevelopment ? "Active development — architecture and milestones evolving on GitHub." : `Browse @${esc(state.profile.githubUsername)} on GitHub for implementation code.`}
+            </div>
+          </div>
+          <a href="https://github.com/${encodeURIComponent(state.profile.githubUsername)}" target="_blank" rel="noopener" class="btn-ghost" data-cursor="GITHUB">Open GitHub</a>
+        </div>
+      `;
+
+      document.getElementById("project-stage").innerHTML = `
+        <div>
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1rem;">
+            <div>
+              <span class="stage-badge ${pr.inDevelopment ? "dev" : ""}">${esc(pr.status)}</span>
+              <h3 style="font-size:clamp(1.45rem, 2.5vw, 1.95rem); font-weight:600; letter-spacing:-0.02em; margin-top:0.75rem;">${esc(pr.title)}</h3>
+              <p style="font-size:0.94rem; color:var(--sapphire-soft);">${esc(pr.subtitle)}</p>
+            </div>
+            <div class="tag-row">
+              ${pr.tech.map(t => `<span class="tag ${pr.inDevelopment ? "gold" : ""}">${esc(t)}</span>`).join("")}
+            </div>
+          </div>
+
+          <p style="font-size:0.92rem; color:#cbd5e1; margin-bottom:1.1rem;">${esc(pr.summary)}</p>
+          <ul class="clean-list" style="margin-bottom:1.35rem;">
+            ${pr.highlights.map(h => `<li>${esc(h)}</li>`).join("")}
+          </ul>
+
+          <div class="stage-flow">
+            ${pr.flow.map(n => `
+              <div class="flow-node">
+                <small>${esc(n.step)}</small>
+                <strong>${esc(n.label)}</strong>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        ${ghRow}
+      `;
+    }
+    function selectProject(i) { activeProjectIdx = i; renderProjects(); }
+
+    function renderCreds() {
+      const items = state.honors.filter(h => activeCredFilter === "all" || h.category === activeCredFilter);
+      document.getElementById("creds-grid").innerHTML = items.map(h => `
+        <div class="glass glass-hover pad">
+          <div style="font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.12em; color:var(--gold-light); margin-bottom:0.45rem;">${esc(h.badge)}</div>
+          <h4 style="font-size:1.02rem; font-weight:600; margin-bottom:0.38rem;">${esc(h.title)}</h4>
+          <p style="font-size:0.86rem; color:var(--text-secondary);">${esc(h.detail)}</p>
+        </div>
+      `).join("");
+    }
+    function filterCreds(cat, btn) {
+      activeCredFilter = cat;
+      document.querySelectorAll(".filters .f-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderCreds();
+    }
+
+    async function fetchWithTimeout(url, ms = 6500) {
+      const ctrl = new AbortController();
+      const id = setTimeout(() => ctrl.abort(), ms);
+      try {
+        const res = await fetch(url, { signal: ctrl.signal });
+        clearTimeout(id);
+        return res;
+      } catch (e) {
+        clearTimeout(id);
+        throw e;
+      }
+    }
+
+    async function syncLiveApis() {
+      const gh = state.profile.githubUsername;
+      const lc = state.profile.leetcodeUsername;
+      const ghPill = document.getElementById("gh-status-pill");
+
+      try {
+        const [uRes, rRes] = await Promise.all([
+          fetchWithTimeout(`https://api.github.com/users/${encodeURIComponent(gh)}`),
+          fetchWithTimeout(`https://api.github.com/users/${encodeURIComponent(gh)}/repos?sort=updated&per_page=30`)
+        ]);
+        if (uRes.ok) {
+          const u = await uRes.json();
+          document.getElementById("gh-repos").textContent = u.public_repos ?? "--";
+          document.getElementById("gh-followers").textContent = u.followers ?? "--";
+          document.getElementById("gh-bio").textContent = u.bio || "Open-source AI, Data Science, and engineering repositories.";
+          ghPill.textContent = "LIVE";
+        }
+        if (rRes.ok) {
+          ghRepos = await rRes.json();
+          document.getElementById("gh-stars").textContent = ghRepos.reduce((s, r) => s + (r.stargazers_count || 0), 0);
+          renderProjects();
+        }
+      } catch (e) {
+        document.getElementById("gh-bio").textContent = "Connect online to pull live GitHub repository metrics.";
+        ghPill.textContent = "OFFLINE";
+      }
+
+      const lcPill = document.getElementById("lc-status-pill");
+      const providers = [
+        async () => {
+          const r = await fetchWithTimeout(`https://leetcode-api-faisalshohag.vercel.app/${encodeURIComponent(lc)}`, 7000);
+          if (!r.ok) throw new Error();
+          const d = await r.json();
+          if (typeof d.totalSolved !== "number") throw new Error();
+          return {
+            total: d.totalSolved,
+            easy: d.easySolved ?? 0,
+            medHard: (d.mediumSolved ?? 0) + (d.hardSolved ?? 0),
+            note: d.ranking ? `Global Rank #${d.ranking.toLocaleString()} • Live LeetCode sync.` : "Live LeetCode statistics synchronized."
+          };
+        },
+        async () => {
+          const r = await fetchWithTimeout(`https://alfa-leetcode-api.onrender.com/${encodeURIComponent(lc)}/solved`, 8000);
+          if (!r.ok) throw new Error();
+          const d = await r.json();
+          if (typeof d.solvedProblem !== "number") throw new Error();
+          return {
+            total: d.solvedProblem,
+            easy: d.easySolved ?? 0,
+            medHard: (d.mediumSolved ?? 0) + (d.hardSolved ?? 0),
+            note: "Live LeetCode problem breakdown synchronized."
+          };
+        },
+        async () => {
+          const r = await fetchWithTimeout(`https://leetcode-stats.tashif.codes/${encodeURIComponent(lc)}`, 7000);
+          if (!r.ok) throw new Error();
+          const d = await r.json();
+          if (typeof d.totalSolved !== "number") throw new Error();
+          return {
+            total: d.totalSolved,
+            easy: d.easySolved ?? 0,
+            medHard: (d.mediumSolved ?? 0) + (d.hardSolved ?? 0),
+            note: d.ranking ? `Global Rank #${d.ranking} • Live LeetCode sync.` : "Live LeetCode statistics synchronized."
+          };
+        }
+      ];
+
+      let lcData = null;
+      for (const fn of providers) {
+        try { lcData = await fn(); if (lcData) break; } catch (e) {}
+      }
+
+      if (lcData) {
+        document.getElementById("lc-total").textContent = lcData.total;
+        document.getElementById("lc-easy").textContent = lcData.easy;
+        document.getElementById("lc-med").textContent = lcData.medHard;
+        document.getElementById("lc-bio").textContent = lcData.note;
+        lcPill.textContent = "LIVE";
+      } else {
+        const fb = state.profile.leetcodeFallback || {};
+        if (fb.total) {
+          document.getElementById("lc-total").textContent = fb.total;
+          document.getElementById("lc-easy").textContent = fb.easy || "--";
+          document.getElementById("lc-med").textContent = fb.medHard || "--";
+          document.getElementById("lc-bio").textContent = fb.note || "Cached LeetCode profile snapshot.";
+          lcPill.textContent = "CACHED";
+        } else {
+          document.getElementById("lc-bio").textContent = "Algorithmic problem solving & data structures tracker.";
+          lcPill.textContent = "DIRECT";
+        }
+      }
+    }
+
+    function initBackground3D() {
+      if (typeof THREE === "undefined") return;
+      const canvas = document.getElementById("bg-3d");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(44, window.innerWidth / window.innerHeight, 0.1, 200);
+      camera.position.set(0, 12.5, 22);
+
+      const uniforms = {
+        uTime: { value: 0 },
+        uMouse: { value: new THREE.Vector2(0, 0) },
+        uScroll: { value: 0 },
+        uPulseTime: { value: -10.0 },
+        uPulseOrigin: { value: new THREE.Vector2(0, 0) }
+      };
+
+      const vertexShader = `
+        uniform float uTime;
+        uniform vec2 uMouse;
+        uniform float uScroll;
+        uniform float uPulseTime;
+        uniform vec2 uPulseOrigin;
+        varying float vElev;
+        varying vec2 vUv;
+        varying vec3 vNormalApprox;
+
+        float waveFn(vec2 p, float t) {
+          float w = 0.0;
+          w += sin(p.x * 0.18 + t * 0.55) * cos(p.y * 0.16 - t * 0.42) * 1.45;
+          w += sin(p.x * 0.34 - p.y * 0.25 + t * 0.7) * 0.55;
+          w += cos(length(p * 0.12) - t * 0.4) * 0.45;
+          vec2 mWorld = vec2(uMouse.x * 20.0, -uMouse.y * 12.0);
+          float md = length(p - mWorld);
+          w += exp(-md * md * 0.018) * 1.65;
+          float age = t - uPulseTime;
+          if (age > 0.0 && age < 4.5) {
+            float pd = length(p - uPulseOrigin);
+            float front = age * 12.0;
+            w += exp(-pow((pd - front) * 0.3, 2.0)) * sin((pd - front) * 1.4) * 1.5 * (1.0 - age / 4.5);
+          }
+          return w;
+        }
+
+        void main() {
+          vUv = uv;
+          vec3 pos = position;
+          float t = uTime + uScroll * 2.5;
+          float h = waveFn(pos.xy, t);
+          float hx = waveFn(pos.xy + vec2(0.25, 0.0), t);
+          float hy = waveFn(pos.xy + vec2(0.0, 0.25), t);
+          vNormalApprox = normalize(vec3(h - hx, h - hy, 0.25));
+          pos.z += h;
+          vElev = h;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+      `;
+
+      const fragmentShader = `
+        uniform float uTime;
+        uniform vec2 uMouse;
+        varying float vElev;
+        varying vec2 vUv;
+        varying vec3 vNormalApprox;
+
+        void main() {
+          vec3 deepNavy = vec3(0.015, 0.032, 0.085);
+          vec3 royalSilk = vec3(0.06, 0.19, 0.48);
+          vec3 goldLine = vec3(0.86, 0.71, 0.28);
+
+          vec3 lightDir = normalize(vec3(uMouse.x * 0.8 + 0.3, -uMouse.y * 0.6 + 0.4, 0.85));
+          float diff = max(dot(vNormalApprox, lightDir), 0.0);
+          float spec = pow(diff, 6.0);
+
+          float heightMix = smoothstep(-1.8, 2.4, vElev);
+          vec3 col = mix(deepNavy, royalSilk, heightMix * 0.85 + spec * 0.35);
+
+          float contour = abs(fract(vElev * 2.6 - 0.5) - 0.5) / max(fwidth(vElev * 2.6), 0.001);
+          float lineMask = 1.0 - smoothstep(0.0, 1.35, contour);
+          col = mix(col, goldLine, lineMask * (0.18 + 0.35 * spec));
+          col += goldLine * pow(heightMix, 3.0) * 0.14 * spec;
+
+          float edgeX = smoothstep(0.0, 0.18, vUv.x) * smoothstep(1.0, 0.82, vUv.x);
+          float edgeY = smoothstep(0.0, 0.22, vUv.y) * smoothstep(1.0, 0.72, vUv.y);
+          float alpha = edgeX * edgeY * 0.88;
+
+          gl_FragColor = vec4(col, alpha);
+        }
+      `;
+
+      const geo = new THREE.PlaneGeometry(78, 46, 150, 96);
+      const mat = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader,
+        fragmentShader,
+        transparent: true,
+        extensions: { derivatives: true }
+      });
+
+      const terrain = new THREE.Mesh(geo, mat);
+      terrain.rotation.x = -Math.PI / 2.45;
+      terrain.position.set(0, -3.5, -6);
+      scene.add(terrain);
+
+      let mx = 0, my = 0;
+      window.addEventListener("mousemove", e => {
+        mx = (e.clientX / window.innerWidth - 0.5) * 2;
+        my = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+      window.addEventListener("click", e => {
+        uniforms.uPulseTime.value = uniforms.uTime.value;
+        uniforms.uPulseOrigin.value.set(
+          (e.clientX / window.innerWidth - 0.5) * 34,
+          -(e.clientY / window.innerHeight - 0.5) * 20
+        );
+      });
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      const clock = new THREE.Clock();
+      function tick() {
+        requestAnimationFrame(tick);
+        uniforms.uTime.value = clock.getElapsedTime();
+        uniforms.uMouse.value.x += (mx - uniforms.uMouse.value.x) * 0.05;
+        uniforms.uMouse.value.y += (my - uniforms.uMouse.value.y) * 0.05;
+        const scrollRatio = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
+        uniforms.uScroll.value += (scrollRatio - uniforms.uScroll.value) * 0.06;
+
+        camera.position.x += (mx * 1.8 - camera.position.x) * 0.03;
+        camera.position.y += (12.5 - my * 1.1 - camera.position.y) * 0.03;
+        camera.lookAt(0, -2.5, -6);
+        renderer.render(scene, camera);
+      }
+      tick();
+    }
+
+    function initUniqueCursor() {
+      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      const canvas = document.getElementById("cursor-canvas");
+      const ctx = canvas.getContext("2d");
+      const lens = document.getElementById("cursor-lens");
+      const tag = document.getElementById("cursor-tag");
+
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize();
+      window.addEventListener("resize", resize);
+
+      const trail = Array.from({ length: 12 }, () => ({ x: -100, y: -100 }));
+      const sparkles = [];
+      let mouse = { x: -100, y: -100 }, prevMouse = { x: -100, y: -100 }, lx = -100, ly = -100, active = false;
+
+      window.addEventListener("mousemove", e => {
+        active = true;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        lens.style.opacity = "1";
+        tag.style.left = `${mouse.x}px`;
+        tag.style.top = `${mouse.y}px`;
+
+        const moveDist = Math.hypot(mouse.x - prevMouse.x, mouse.y - prevMouse.y);
+        if (prevMouse.x > 0 && moveDist > 3) {
+          const count = Math.min(2, Math.floor(moveDist / 12) + 1);
+          for (let s = 0; s < count; s++) {
+            const t = Math.random();
+            sparkles.push({
+              x: prevMouse.x + (mouse.x - prevMouse.x) * t + (Math.random() - 0.5) * 9,
+              y: prevMouse.y + (mouse.y - prevMouse.y) * t + (Math.random() - 0.5) * 9,
+              vx: (Math.random() - 0.5) * 0.35,
+              vy: (Math.random() - 0.5) * 0.35 + 0.12,
+              r: 0.65 + Math.random() * 0.95,
+              life: 1.0,
+              decay: 0.028 + Math.random() * 0.022,
+              phase: Math.random() * Math.PI * 2,
+              bright: Math.random() > 0.45
+            });
+          }
+          if (sparkles.length > 48) sparkles.splice(0, sparkles.length - 48);
+        }
+        prevMouse.x = mouse.x;
+        prevMouse.y = mouse.y;
+
+        const el = e.target.closest("a, button, [data-cursor]");
+        if (el) {
+          document.body.classList.add("c-hover");
+          const txt = el.getAttribute("data-cursor");
+          if (txt) { tag.textContent = txt; tag.classList.add("show"); }
+          else { tag.classList.remove("show"); }
+        } else {
+          document.body.classList.remove("c-hover");
+          tag.classList.remove("show");
+        }
+      });
+
+      window.addEventListener("mousedown", () => document.body.classList.add("c-drag"));
+      window.addEventListener("mouseup", () => document.body.classList.remove("c-drag"));
+
+      function draw(now) {
+        requestAnimationFrame(draw);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (!active) return;
+
+        lx += (mouse.x - lx) * 0.34;
+        ly += (mouse.y - ly) * 0.34;
+        lens.style.left = `${lx}px`;
+        lens.style.top = `${ly}px`;
+
+        trail[0].x += (mouse.x - trail[0].x) * 0.54;
+        trail[0].y += (mouse.y - trail[0].y) * 0.54;
+        for (let i = 1; i < trail.length; i++) {
+          trail[i].x += (trail[i - 1].x - trail[i].x) * 0.38;
+          trail[i].y += (trail[i - 1].y - trail[i].y) * 0.38;
+        }
+
+        // Mild Golden Luminous Ribbon Trail
+        ctx.save();
+        ctx.lineCap = "round";
+        ctx.shadowColor = "rgba(250, 204, 21, 0.45)";
+        ctx.shadowBlur = 6;
+        for (let i = 0; i < trail.length - 1; i++) {
+          const p0 = trail[i];
+          const p1 = trail[i + 1];
+          const progress = 1 - i / trail.length;
+          const alpha = progress * progress * 0.42;
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.strokeStyle = i < 3
+            ? `rgba(254, 240, 138, ${alpha})`
+            : `rgba(212, 175, 55, ${alpha * 0.85})`;
+          ctx.lineWidth = Math.max(0.35, 1.45 * progress);
+          ctx.stroke();
+        }
+
+        // Mild Twinkling Golden Glitter Motes
+        for (let i = sparkles.length - 1; i >= 0; i--) {
+          const sp = sparkles[i];
+          sp.x += sp.vx;
+          sp.y += sp.vy;
+          sp.life -= sp.decay;
+          if (sp.life <= 0) {
+            sparkles.splice(i, 1);
+            continue;
+          }
+          const twinkle = 0.55 + 0.45 * Math.sin(now * 0.018 + sp.phase);
+          const a = sp.life * twinkle * 0.62;
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2);
+          ctx.fillStyle = sp.bright
+            ? `rgba(254, 249, 195, ${a})`
+            : `rgba(234, 179, 8, ${a})`;
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Subtle Center Pinpoint
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 1.6, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(254, 240, 138, 0.85)";
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+
+    let patrolActive = true;
+    const whisperEl = document.getElementById("bot-whisper");
+    let whisperTimer = null;
+
+    function whisper(text, ms = 3200) {
+      whisperEl.textContent = text;
+      whisperEl.classList.add("show");
+      clearTimeout(whisperTimer);
+      whisperTimer = setTimeout(() => whisperEl.classList.remove("show"), ms);
+    }
+
+    function toggleBotPatrol() {
+      patrolActive = !patrolActive;
+      document.getElementById("walk-flag").textContent = patrolActive ? "Active" : "Paused";
+      whisper(patrolActive ? "Eon resuming patrol." : "Eon standing by.");
+    }
+
+    function makeOchreMetalTexture() {
+      const c = document.createElement("canvas");
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext("2d");
+      const g = ctx.createLinearGradient(0, 0, 256, 256);
+      g.addColorStop(0, "#df9e26");
+      g.addColorStop(0.55, "#c68118");
+      g.addColorStop(1, "#a66810");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 256, 256);
+      ctx.strokeStyle = "rgba(30, 20, 5, 0.25)";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(10, 10, 236, 236);
+      for (let i = 0; i < 65; i++) {
+        ctx.fillStyle = `rgba(255, 240, 200, ${Math.random() * 0.08})`;
+        ctx.fillRect(Math.random() * 256, Math.random() * 256, Math.random() * 28, 1.5);
+      }
+      ctx.fillStyle = "rgba(25, 25, 30, 0.72)";
+      ctx.fillRect(28, 202, 200, 11);
+      ctx.fillStyle = "#e11d48";
+      ctx.beginPath(); ctx.arc(214, 207.5, 4.5, 0, Math.PI * 2); ctx.fill();
+      return new THREE.CanvasTexture(c);
+    }
+
+    function init3DRoverBot() {
+      if (typeof THREE === "undefined") return;
+      const canvas = document.getElementById("bot-3d-canvas");
+      const hitbox = document.getElementById("bot-hitbox");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const scene = new THREE.Scene();
+      const fov = 34;
+      const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 10, 3000);
+
+      function syncCam() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.position.z = (window.innerHeight / 2) / Math.tan(THREE.MathUtils.degToRad(fov / 2));
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      syncCam();
+      window.addEventListener("resize", syncCam);
+
+      scene.add(new THREE.AmbientLight(0xdbeafe, 0.75));
+      const key = new THREE.DirectionalLight(0xfff1d6, 1.65);
+      key.position.set(160, 280, 320);
+      scene.add(key);
+      const rimBlue = new THREE.DirectionalLight(0x60a5fa, 1.45);
+      rimBlue.position.set(-240, 140, -180);
+      scene.add(rimBlue);
+      const rimGold = new THREE.PointLight(0xfacc15, 0.9, 600);
+      rimGold.position.set(0, -40, 180);
+      scene.add(rimGold);
+
+      const matOchre = new THREE.MeshStandardMaterial({ map: makeOchreMetalTexture(), metalness: 0.42, roughness: 0.38 });
+      const matBrushedSteel = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.76, roughness: 0.26 });
+      const matGunmetal = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.65, roughness: 0.38 });
+      const matRubber = new THREE.MeshStandardMaterial({ color: 0x0b1120, metalness: 0.18, roughness: 0.88 });
+      const matChrome = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.92, roughness: 0.12 });
+      const matGlassLens = new THREE.MeshPhysicalMaterial({ color: 0x0ea5e9, metalness: 0.2, roughness: 0.05, clearcoat: 1.0 });
+      const matOpticCore = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+      const matChargeBar = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+
+      const root = new THREE.Group();
+      root.scale.setScalar(1.12);
+      const chassisPivot = new THREE.Group();
+      root.add(chassisPivot);
+
+      const treadShape = new THREE.Shape();
+      treadShape.moveTo(-18, 2);
+      treadShape.quadraticCurveTo(-21, 2, -19, 8);
+      treadShape.lineTo(-10, 24);
+      treadShape.quadraticCurveTo(-8, 27, -4, 27);
+      treadShape.lineTo(5, 27);
+      treadShape.quadraticCurveTo(9, 27, 11, 23);
+      treadShape.lineTo(19, 8);
+      treadShape.quadraticCurveTo(21, 2, 18, 2);
+      treadShape.closePath();
+
+      const treadGeo = new THREE.ExtrudeGeometry(treadShape, {
+        depth: 10, bevelEnabled: true, bevelThickness: 1.8, bevelSize: 1.4, bevelSegments: 3
+      });
+      treadGeo.translate(0, 0, -5);
+
+      const wheels = [];
+      function buildTread(sideX) {
+        const g = new THREE.Group();
+        g.position.set(sideX, 0, 0);
+        g.rotation.y = Math.PI / 2;
+
+        const belt = new THREE.Mesh(treadGeo, matRubber);
+        g.add(belt);
+
+        for (let i = -14; i <= 14; i += 5.6) {
+          const cleat = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.4, 13.4), matGunmetal);
+          cleat.position.set(i, 0.2, 0);
+          g.add(cleat);
+        }
+
+        [[-11.5, 7.2, 5.2], [11.5, 7.2, 5.2], [-1.5, 20.5, 4.4]].forEach(([wx, wy, wr]) => {
+          const wheelGrp = new THREE.Group();
+          wheelGrp.position.set(wx, wy, 0);
+          const rimDisk = new THREE.Mesh(new THREE.CylinderGeometry(wr, wr, 13.8, 18), matBrushedSteel);
+          rimDisk.rotation.x = Math.PI / 2;
+          const hubBolt = new THREE.Mesh(new THREE.CylinderGeometry(wr * 0.42, wr * 0.42, 14.6, 6), matGunmetal);
+          hubBolt.rotation.x = Math.PI / 2;
+          wheelGrp.add(rimDisk, hubBolt);
+          g.add(wheelGrp);
+          wheels.push(wheelGrp);
+        });
+        return g;
+      }
+      chassisPivot.add(buildTread(-19.5), buildTread(19.5));
+
+      const bodyShape = new THREE.Shape();
+      bodyShape.moveTo(-13, -12); bodyShape.lineTo(13, -12);
+      bodyShape.lineTo(13, 12); bodyShape.lineTo(-13, 12); bodyShape.closePath();
+      const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, {
+        depth: 23, bevelEnabled: true, bevelThickness: 1.8, bevelSize: 1.5, bevelSegments: 3
+      });
+      bodyGeo.translate(0, 0, -11.5);
+
+      const bodyGroup = new THREE.Group();
+      bodyGroup.position.y = 26;
+      bodyGroup.add(new THREE.Mesh(bodyGeo, matOchre));
+
+      const upperDeck = new THREE.Mesh(new THREE.BoxGeometry(29, 6.2, 26.5), matGunmetal);
+      upperDeck.position.y = 11.8;
+      bodyGroup.add(upperDeck);
+
+      const displayHousing = new THREE.Mesh(new THREE.BoxGeometry(17, 7.5, 2.2), matGunmetal);
+      displayHousing.position.set(0, 6.2, 13.5);
+      bodyGroup.add(displayHousing);
+
+      for (let b = 0; b < 5; b++) {
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.9, 0.6), matChargeBar);
+        bar.position.set(4.2, 3.8 + b * 1.2, 14.7);
+        bodyGroup.add(bar);
+      }
+      const leftScreen = new THREE.Mesh(new THREE.BoxGeometry(5.5, 5.2, 0.6), matOpticCore);
+      leftScreen.position.set(-4.2, 6.2, 14.6);
+      bodyGroup.add(leftScreen);
+
+      chassisPivot.add(bodyGroup);
+
+      function buildDetailedArm(side) {
+        const shoulder = new THREE.Group();
+        shoulder.position.set(side * 17, 34, 2);
+
+        const mount = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.6, 5.5, 16), matGunmetal);
+        mount.rotation.z = Math.PI / 2;
+        const armSleeve = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.8, 13, 14), matOchre);
+        armSleeve.rotation.x = Math.PI / 2;
+        armSleeve.position.z = 6.5;
+
+        const piston = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 15, 10), matChrome);
+        piston.rotation.x = Math.PI / 2;
+        piston.position.set(0, 1.5, 8);
+
+        const wrist = new THREE.Group();
+        wrist.position.z = 15.5;
+        const palm = new THREE.Mesh(new THREE.BoxGeometry(4.6, 4.2, 3.5), matGunmetal);
+        const f1 = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.2, 7.5), matBrushedSteel);
+        f1.position.set(-1.3, 1.8, 4.2);
+        const f2 = f1.clone();
+        f2.position.x = 1.3;
+        const thumb = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.3, 6.8), matBrushedSteel);
+        thumb.position.set(0, -1.8, 3.8);
+        wrist.add(palm, f1, f2, thumb);
+
+        shoulder.add(mount, armSleeve, piston, wrist);
+        return { shoulder, wrist };
+      }
+      const armL = buildDetailedArm(-1);
+      const armR = buildDetailedArm(1);
+      chassisPivot.add(armL.shoulder, armR.shoulder);
+
+      const neckPivot = new THREE.Group();
+      neckPivot.position.set(0, 41, 0);
+      for (let s = 0; s < 3; s++) {
+        const seg = new THREE.Mesh(new THREE.CylinderGeometry(3.2 - s * 0.4, 3.6 - s * 0.4, 5.2, 14), s % 2 === 0 ? matOchre : matGunmetal);
+        seg.position.y = 3 + s * 4.8;
+        neckPivot.add(seg);
+      }
+
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, 18.5, 2);
+
+      function makeEyeHousingShape(side) {
+        const sh = new THREE.Shape();
+        if (side < 0) {
+          sh.moveTo(-7.2, -4.5);
+          sh.quadraticCurveTo(-8.8, 0, -6.8, 5.0);
+          sh.quadraticCurveTo(-2.0, 6.5, 4.8, 3.6);
+          sh.quadraticCurveTo(6.6, 1.5, 5.2, -2.5);
+          sh.quadraticCurveTo(0.5, -5.8, -7.2, -4.5);
+        } else {
+          sh.moveTo(7.2, -4.5);
+          sh.quadraticCurveTo(8.8, 0, 6.8, 5.0);
+          sh.quadraticCurveTo(2.0, 6.5, -4.8, 3.6);
+          sh.quadraticCurveTo(-6.6, 1.5, -5.2, -2.5);
+          sh.quadraticCurveTo(-0.5, -5.8, 7.2, -4.5);
+        }
+        return new THREE.ExtrudeGeometry(sh, {
+          depth: 11.5, bevelEnabled: true, bevelThickness: 1.4, bevelSize: 1.1, bevelSegments: 3
+        });
+      }
+
+      function buildBinocularEye(side) {
+        const pivot = new THREE.Group();
+        pivot.position.set(side * 8.4, 0, 0);
+
+        const housingGeo = makeEyeHousingShape(side);
+        housingGeo.translate(0, 0, -5.75);
+        const housing = new THREE.Mesh(housingGeo, matBrushedSteel);
+
+        const innerBezel = new THREE.Mesh(new THREE.TorusGeometry(3.6, 0.75, 14, 28), matGunmetal);
+        innerBezel.position.set(side * -0.5, 0.2, 6.6);
+
+        const chromeRing = new THREE.Mesh(new THREE.TorusGeometry(2.7, 0.35, 12, 24), matChrome);
+        chromeRing.position.set(side * -0.5, 0.2, 7.1);
+
+        const glassDisk = new THREE.Mesh(new THREE.CircleGeometry(2.6, 22), matGlassLens);
+        glassDisk.position.set(side * -0.5, 0.2, 6.95);
+
+        const opticPupil = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.85, 20), matOpticCore);
+        opticPupil.position.set(side * -0.5, 0.2, 7.15);
+
+        pivot.add(housing, innerBezel, chromeRing, glassDisk, opticPupil);
+        pivot.rotation.z = side * -0.1;
+        return pivot;
+      }
+
+      const eyeL = buildBinocularEye(-1);
+      const eyeR = buildBinocularEye(1);
+      headGroup.add(eyeL, eyeR);
+      neckPivot.add(headGroup);
+      chassisPivot.add(neckPivot);
+
+      const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.42 });
+      const shadow = new THREE.Mesh(new THREE.CircleGeometry(28, 32), shadowMat);
+      shadow.rotation.x = -Math.PI / 2.3;
+      scene.add(shadow);
+
+      const dustRing = new THREE.Mesh(
+        new THREE.RingGeometry(18, 24, 32),
+        new THREE.MeshBasicMaterial({ color: 0xd4af37, transparent: true, opacity: 0, side: THREE.DoubleSide })
+      );
+      dustRing.rotation.x = -Math.PI / 2.3;
+      scene.add(dustRing);
+
+      scene.add(root);
+
+      const FLOOR_PAD = 12;
+      const GRAVITY = 760;
+      let mode = "ROLL";
+      let sx = 155, sy = window.innerHeight - FLOOR_PAD;
+      let vx = 0, vy = 0, dir = 1, speed = 56, wheelRot = 0;
+      let timer = 0, impactForce = 0, dustScale = 1;
+      let dragging = false, downPos = { x: 0, y: 0 }, lastPt = { x: 0, y: 0, t: 0 };
+      let cursorPt = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+      window.addEventListener("mousemove", e => { cursorPt.x = e.clientX; cursorPt.y = e.clientY; });
+
+      hitbox.addEventListener("pointerdown", e => {
+        e.preventDefault();
+        dragging = true;
+        hitbox.setPointerCapture(e.pointerId);
+        downPos = { x: e.clientX, y: e.clientY };
+        lastPt = { x: e.clientX, y: e.clientY, t: performance.now() };
+        mode = "DRAG";
+        vx = 0; vy = 0;
+      });
+
+      window.addEventListener("pointermove", e => {
+        if (!dragging || mode !== "DRAG") return;
+        const now = performance.now();
+        const dt = Math.max(8, now - lastPt.t) / 1000;
+        vx = THREE.MathUtils.clamp((e.clientX - lastPt.x) / dt, -820, 820);
+        vy = THREE.MathUtils.clamp((e.clientY - lastPt.y) / dt, -760, 760);
+        sx = THREE.MathUtils.clamp(e.clientX, 45, window.innerWidth - 45);
+        sy = THREE.MathUtils.clamp(e.clientY + 42, 95, window.innerHeight - FLOOR_PAD);
+        lastPt = { x: e.clientX, y: e.clientY, t: now };
+      });
+
+      window.addEventListener("pointerup", e => {
+        if (!dragging) return;
+        dragging = false;
+        const dist = Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y);
+        if (dist < 6) {
+          sy = window.innerHeight - FLOOR_PAD;
+          mode = "PAUSE";
+          timer = 2.2;
+          toggleDrawer();
+          return;
+        }
+        if (performance.now() - lastPt.t > 90) { vx *= 0.2; vy *= 0.15; }
+        mode = "FALL";
+        whisper("Eon gyro alert — stabilizing!", 2200);
+      });
+
+      let prev = performance.now();
+      function step(now) {
+        requestAnimationFrame(step);
+        const dt = Math.min(0.04, (now - prev) / 1000);
+        prev = now;
+        const floorY = window.innerHeight - FLOOR_PAD;
+
+        if (mode === "ROLL") {
+          matOpticCore.color.setHex(0x38bdf8);
+          matChargeBar.color.setHex(0xfacc15);
+          if (!patrolActive) { mode = "PAUSE"; timer = 1.5; }
+          else {
+            sx += dir * speed * dt;
+            sy = floorY;
+            wheelRot -= dir * dt * 4.2;
+            if (sx > window.innerWidth - 78) dir = -1;
+            if (sx < 78) dir = 1;
+            if (Math.random() < dt * 0.14) { mode = "PAUSE"; timer = 1.6 + Math.random() * 1.8; }
+          }
+          wheels.forEach(w => { w.rotation.z = wheelRot; });
+          chassisPivot.position.y = Math.abs(Math.sin(wheelRot * 1.4)) * 1.0;
+          chassisPivot.scale.set(1, 1, 1);
+          chassisPivot.rotation.z += (0 - chassisPivot.rotation.z) * 0.12;
+          root.rotation.y += ((dir > 0 ? Math.PI / 2.5 : -Math.PI / 2.5) - root.rotation.y) * 0.08;
+          armL.shoulder.rotation.x += (0.14 - armL.shoulder.rotation.x) * 0.1;
+          armR.shoulder.rotation.x += (0.14 - armR.shoulder.rotation.x) * 0.1;
+          armL.shoulder.rotation.z += (0 - armL.shoulder.rotation.z) * 0.1;
+          armR.shoulder.rotation.z += (0 - armR.shoulder.rotation.z) * 0.1;
+          eyeL.rotation.z += (0.1 - eyeL.rotation.z) * 0.1;
+          eyeR.rotation.z += (-0.1 - eyeR.rotation.z) * 0.1;
+          neckPivot.position.y += (41 - neckPivot.position.y) * 0.1;
+          neckPivot.rotation.y += (0 - neckPivot.rotation.y) * 0.1;
+          neckPivot.rotation.x += (0 - neckPivot.rotation.x) * 0.1;
+
+        } else if (mode === "PAUSE") {
+          sy = floorY;
+          timer -= dt;
+          matOpticCore.color.setHex(0x38bdf8);
+          chassisPivot.position.y = Math.sin(now * 0.003) * 0.55;
+          root.rotation.y += (0 - root.rotation.y) * 0.08;
+          const lx = THREE.MathUtils.clamp((cursorPt.x - sx) / 420, -0.5, 0.5);
+          const ly = THREE.MathUtils.clamp((cursorPt.y - (sy - 55)) / 480, -0.25, 0.25);
+          neckPivot.rotation.y += (lx - neckPivot.rotation.y) * 0.1;
+          neckPivot.rotation.x += (ly - neckPivot.rotation.x) * 0.1;
+          eyeL.rotation.z += (0.08 + Math.sin(now * 0.002) * 0.05 - eyeL.rotation.z) * 0.1;
+          eyeR.rotation.z += (-0.08 - Math.sin(now * 0.002) * 0.05 - eyeR.rotation.z) * 0.1;
+          if (timer <= 0 && patrolActive) {
+            if (Math.random() < 0.45) dir *= -1;
+            mode = "ROLL";
+          }
+
+        } else if (mode === "DRAG") {
+          root.rotation.y += (0 - root.rotation.y) * 0.14;
+          matOpticCore.color.setHex(0xfacc15);
+          chassisPivot.rotation.z = THREE.MathUtils.clamp(-vx * 0.00048, -0.42, 0.42);
+          armL.shoulder.rotation.x = -0.55;
+          armR.shoulder.rotation.x = -0.55;
+          armL.shoulder.rotation.z = -0.28;
+          armR.shoulder.rotation.z = 0.28;
+          eyeL.rotation.z = 0.24;
+          eyeR.rotation.z = -0.24;
+          neckPivot.rotation.x = 0.22;
+
+        } else if (mode === "FALL") {
+          vy += GRAVITY * dt;
+          vy = Math.min(vy, 540);
+          vx *= 0.994;
+          sx += vx * dt;
+          sy += vy * dt;
+          if (sx < 50) { sx = 50; vx = Math.abs(vx) * 0.55; }
+          if (sx > window.innerWidth - 50) { sx = window.innerWidth - 50; vx = -Math.abs(vx) * 0.55; }
+
+          const panicOsc = Math.sin(now * 0.028);
+          const panicFast = Math.cos(now * 0.036);
+          root.rotation.y += (0 - root.rotation.y) * 0.14;
+          chassisPivot.rotation.z = panicOsc * 0.22 + THREE.MathUtils.clamp(-vx * 0.0003, -0.32, 0.32);
+
+          armL.shoulder.rotation.x = -0.95 + panicOsc * 0.9;
+          armR.shoulder.rotation.x = -0.95 - panicOsc * 0.9;
+          armL.shoulder.rotation.z = -0.45 + panicFast * 0.28;
+          armR.shoulder.rotation.z = 0.45 - panicFast * 0.28;
+          armL.wrist.rotation.x = panicFast * 0.65;
+          armR.wrist.rotation.x = -panicFast * 0.65;
+
+          neckPivot.position.y = 44.5 + Math.abs(panicOsc) * 3.2;
+          neckPivot.rotation.y = panicFast * 0.32;
+          neckPivot.rotation.x = -0.2;
+          eyeL.rotation.z = 0.34 + panicOsc * 0.09;
+          eyeR.rotation.z = -0.34 - panicOsc * 0.09;
+
+          wheelRot += dt * 14;
+          wheels.forEach(w => { w.rotation.z = wheelRot; });
+
+          const flash = Math.floor(now / 110) % 2 === 0;
+          matOpticCore.color.setHex(flash ? 0xf87171 : 0xfacc15);
+          matChargeBar.color.setHex(flash ? 0xf87171 : 0xfacc15);
+
+          if (sy >= floorY) {
+            impactForce = Math.min(1, Math.abs(vy) / 560);
+            sy = floorY;
+            vx *= 0.3;
+            vy = 0;
+            mode = "REACT";
+            timer = 1.25;
+            dustScale = 0.6;
+            dustRing.material.opacity = 0.48 * impactForce + 0.22;
+          }
+
+        } else if (mode === "REACT") {
+          timer -= dt;
+          sx = THREE.MathUtils.clamp(sx + vx * dt, 54, window.innerWidth - 54);
+          vx *= 0.86;
+          const p = 1 - timer / 1.25;
+          const dip = Math.sin(Math.min(1, p * 1.5) * Math.PI) * (0.26 * impactForce + 0.09);
+
+          chassisPivot.scale.set(1 + dip * 0.34, 1 - dip, 1 + dip * 0.34);
+          chassisPivot.rotation.z += (0 - chassisPivot.rotation.z) * 0.14;
+          neckPivot.position.y += (41 - neckPivot.position.y) * 0.12;
+          neckPivot.rotation.y = Math.sin(p * Math.PI * 3) * (1 - p) * 0.38;
+          neckPivot.rotation.x = 0.16 * (1 - p);
+
+          armL.shoulder.rotation.x += (0.18 - armL.shoulder.rotation.x) * 0.1;
+          armR.shoulder.rotation.x += (0.18 - armR.shoulder.rotation.x) * 0.1;
+          armL.shoulder.rotation.z += (0 - armL.shoulder.rotation.z) * 0.1;
+          armR.shoulder.rotation.z += (0 - armR.shoulder.rotation.z) * 0.1;
+          armL.wrist.rotation.x *= 0.85;
+          armR.wrist.rotation.x *= 0.85;
+
+          eyeL.rotation.z += (0.1 - eyeL.rotation.z) * 0.1;
+          eyeR.rotation.z += (-0.1 - eyeR.rotation.z) * 0.1;
+          matOpticCore.color.setHex(0x38bdf8);
+          matChargeBar.color.setHex(0xfacc15);
+
+          if (timer <= 0) {
+            chassisPivot.scale.set(1, 1, 1);
+            mode = patrolActive ? "ROLL" : "PAUSE";
+            timer = 1.4;
+          }
+        }
+
+        const wx = sx - window.innerWidth / 2;
+        const wy = window.innerHeight / 2 - sy;
+        const floorWorldY = window.innerHeight / 2 - floorY;
+
+        root.position.set(wx, wy, 0);
+
+        const airH = Math.max(0, floorY - sy);
+        const sScale = Math.max(0.28, 1 - airH / 520);
+        shadow.position.set(wx, floorWorldY + 1, -4);
+        shadow.scale.set(sScale, sScale, 1);
+        shadowMat.opacity = 0.42 * sScale;
+
+        if (dustRing.material.opacity > 0.01) {
+          dustScale += dt * 3.4;
+          dustRing.position.set(wx, floorWorldY + 2, -2);
+          dustRing.scale.set(dustScale, dustScale, 1);
+          dustRing.material.opacity *= 0.9;
+        }
+
+        hitbox.style.left = `${sx}px`;
+        hitbox.style.top = `${sy}px`;
+        whisperEl.style.left = `${Math.min(window.innerWidth - 240, Math.max(20, sx))}px`;
+        whisperEl.style.top = `${sy - 108}px`;
+
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(step);
+      setTimeout(() => whisper("I'm Eon. Drag & toss me, or click to ask about Prajin's work.", 4500), 1600);
+    }
+
+    function toggleDrawer(force) {
+      const d = document.getElementById("ai-drawer");
+      const open = typeof force === "boolean" ? force : !d.classList.contains("open");
+      d.classList.toggle("open", open);
+      if (open && !document.getElementById("drawer-log").hasChildNodes()) {
+        pushEonMsg("Hello, I'm **Eon**. Ask me about **Fit Surfer**, **CCTV Adaptive Video Analytics**, **Screenly AI**, **Pathwise Companion**, or Prajin's background.");
+      }
+    }
+    function pushEonMsg(txt, who = "ai") {
+      const log = document.getElementById("drawer-log");
+      const div = document.createElement("div");
+      div.className = `msg ${who}`;
+      div.innerHTML = esc(txt).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+    function handleEonSubmit(e) {
+      e.preventDefault();
+      const inp = document.getElementById("eon-in");
+      const q = inp.value.trim();
+      if (!q) return;
+      inp.value = "";
+      askEon(q);
+    }
+    function askEon(query) {
+      toggleDrawer(true);
+      pushEonMsg(query, "me");
+      const q = query.toLowerCase();
+      const p = state.profile;
+      setTimeout(() => {
+        if (q.includes("pathwise")) {
+          selectProject(3);
+          document.getElementById("projects").scrollIntoView({ behavior: "smooth" });
+          pushEonMsg("**Pathwise Companion** is currently in its **In Development** phase, focused on adaptive goal modeling and progression guidance.");
+          return;
+        }
+        if (q.includes("project") || q.includes("fit") || q.includes("cctv") || q.includes("screenly")) {
+          document.getElementById("projects").scrollIntoView({ behavior: "smooth" });
+          pushEonMsg("Featured productions: **Fit Surfer**, **CCTV Adaptive Video Analytics** (VIT 5G Hackathon), **Screenly AI**, and **Pathwise Companion** (In Development).");
+          return;
+        }
+        if (q.includes("skill") || q.includes("stack") || q.includes("python")) {
+          document.getElementById("capabilities").scrollIntoView({ behavior: "smooth" });
+          pushEonMsg("Core technical stack: **Python, Java, SQL, Pandas, NumPy, Tableau, Power BI, Git & GitHub**.");
+          return;
+        }
+        if (q.includes("education") || q.includes("intern") || q.includes("background")) {
+          document.getElementById("background").scrollIntoView({ behavior: "smooth" });
+          pushEonMsg(`B.Tech AI & Data Science at Velalar CET (**CGPA ${p.cgpa}**), HSC **${p.hsc}**, plus a **Data Scientist Internship** (Dec 2024) in Python & Pandas automation.`);
+          return;
+        }
+        if (q.includes("contact") || q.includes("email") || q.includes("phone")) {
+          document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+          pushEonMsg(`Contact **${p.name}** at **${p.email}** or **${p.phone}** (${p.location}).`);
+          return;
+        }
+        pushEonMsg("Ask me about **Projects**, **Pathwise Companion**, **Skills**, **Background**, or **Contact**—or drag & toss me along the bottom!");
+      }, 220);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add("open"); }
+    function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+    function openDossier() {
+      const p = state.profile;
+      document.getElementById("dossier-body").innerHTML = `
+        <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--gold-light); letter-spacing:0.14em;">CURRICULUM VITAE</span>
+        <h2 style="font-size:1.65rem; font-weight:600; margin:0.25rem 0;">${esc(p.name)}</h2>
+        <p style="color:var(--sapphire-soft); font-size:0.88rem; margin-bottom:1rem;">${esc(p.location)} • ${esc(p.email)} • ${esc(p.phone)}</p>
+        <p style="font-size:0.92rem; color:#cbd5e1; margin-bottom:1.15rem;">${esc(p.summary)}</p>
+        <div class="s-box">
+          <div><strong style="color:var(--gold-light);">Education:</strong> B.Tech AI &amp; Data Science (CGPA ${esc(p.cgpa)}) • HSC ${esc(p.hsc)}</div>
+          <div style="margin-top:0.4rem;"><strong style="color:var(--gold-light);">Projects:</strong> Fit Surfer • CCTV Adaptive Video Analytics • Screenly AI • Pathwise Companion (In Development)</div>
+          <div style="margin-top:0.4rem;"><strong style="color:var(--gold-light);">Internship:</strong> Data Scientist — Intern (Dec 2024, Python &amp; Pandas Workflow Automation)</div>
+        </div>
+        <button class="btn-primary" onclick="window.print()">Print / Save PDF</button>
+      `;
+      openModal("dossier-modal");
+    }
+
+    function openOwnerAuth() {
+      if (studioUnlocked) { renderStudio("identity"); openModal("studio-modal"); return; }
+      document.getElementById("studio-body").innerHTML = `
+        <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--gold-light); letter-spacing:0.14em;">RESTRICTED</span>
+        <h2 style="font-size:1.45rem; font-weight:600; margin:0.25rem 0 0.5rem;">Owner Studio</h2>
+        <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:1.15rem;">
+          Authenticate to upload your portrait photo, edit projects or bio, set LeetCode snapshot fallbacks, and export a permanent HTML build.
+        </p>
+        <form onsubmit="unlockOwner(event)">
+          <div class="fg"><label>PASSCODE</label><input type="password" id="o-pass" required placeholder="Enter owner passcode" autofocus /></div>
+          <div id="o-err" style="color:#f87171; font-size:0.82rem; margin-bottom:0.8rem;"></div>
+          <button type="submit" class="btn-primary">Unlock Studio</button>
+        </form>
+      `;
+      openModal("studio-modal");
+    }
+
+    function unlockOwner(e) {
+      e.preventDefault();
+      const val = document.getElementById("o-pass").value;
+      const activeHash = getPassHash();
+      const ok = activeHash === "DEFAULT_INIT"
+        ? (val === atob("UHJhamluQDIwMjY="))
+        : (sha256Sync(val) === activeHash);
+      if (ok) {
+        studioUnlocked = true;
+        renderStudio("identity");
+      } else {
+        document.getElementById("o-err").textContent = "Incorrect passcode.";
+      }
+    }
+
+    function renderStudio(tab = "identity") {
+      const p = state.profile;
+      const fb = p.leetcodeFallback || {};
+      let panel = "";
+      if (tab === "identity") {
+        panel = `
+          <div class="s-box">
+            <div class="fg" style="margin:0;">
+              <label>PORTRAIT PHOTO (UPLOAD YOUR FORMAL SUIT HEADSHOT)</label>
+              <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+                <input type="file" accept="image/*" onchange="uploadPhoto(event)" style="width:auto;" />
+                <button type="button" class="f-btn" onclick="clearPhoto()">Reset Photo</button>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="fg"><label>FULL NAME</label><input id="ed-name" value="${esc(p.name)}"></div>
+            <div class="fg"><label>KICKER</label><input id="ed-kicker" value="${esc(p.kicker)}"></div>
+            <div class="fg"><label>HEADLINE</label><input id="ed-role" value="${esc(p.role)}"></div>
+            <div class="fg"><label>LOCATION</label><input id="ed-loc" value="${esc(p.location)}"></div>
+            <div class="fg"><label>CGPA</label><input id="ed-cgpa" value="${esc(p.cgpa)}"></div>
+            <div class="fg"><label>HSC</label><input id="ed-hsc" value="${esc(p.hsc)}"></div>
+            <div class="fg"><label>EMAIL</label><input id="ed-email" value="${esc(p.email)}"></div>
+            <div class="fg"><label>PHONE</label><input id="ed-phone" value="${esc(p.phone)}"></div>
+            <div class="fg"><label>GITHUB</label><input id="ed-gh" value="${esc(p.githubUsername)}"></div>
+            <div class="fg"><label>LEETCODE</label><input id="ed-lc" value="${esc(p.leetcodeUsername)}"></div>
+          </div>
+          <div class="fg"><label>LINKEDIN HANDLE</label><input id="ed-li" value="${esc(p.linkedinHandle)}"></div>
+          <div class="s-box">
+            <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--gold-light); margin-bottom:0.6rem;">OPTIONAL LEETCODE FALLBACK (IF LIVE PROXY BLOCKED BY FIREWALL)</div>
+            <div class="grid-3">
+              <div class="fg" style="margin:0;"><label>TOTAL SOLVED</label><input id="ed-lc-tot" value="${esc(fb.total || "")}" placeholder="e.g. 120"></div>
+              <div class="fg" style="margin:0;"><label>EASY</label><input id="ed-lc-ez" value="${esc(fb.easy || "")}" placeholder="e.g. 70"></div>
+              <div class="fg" style="margin:0;"><label>MED / HARD</label><input id="ed-lc-mh" value="${esc(fb.medHard || "")}" placeholder="e.g. 50"></div>
+            </div>
+          </div>
+          <div class="fg"><label>SUMMARY</label><textarea id="ed-sum" rows="3">${esc(p.summary)}</textarea></div>
+          <button class="btn-primary" onclick="saveIdentity()">Save Changes</button>
+        `;
+      } else if (tab === "projects") {
+        panel = `
+          ${state.projects.map((pr, i) => `
+            <div class="s-box">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                <strong style="color:var(--gold-light);">${esc(pr.title)}</strong>
+                <button class="f-btn" style="color:#f87171;" onclick="delProj(${i})">Remove</button>
+              </div>
+              <div class="grid-2">
+                <div class="fg"><label>TITLE</label><input id="pr-t-${i}" value="${esc(pr.title)}"></div>
+                <div class="fg"><label>STATUS</label><input id="pr-st-${i}" value="${esc(pr.status)}"></div>
+              </div>
+              <div class="grid-2">
+                <div class="fg"><label>SUBTITLE</label><input id="pr-sub-${i}" value="${esc(pr.subtitle)}"></div>
+                <div class="fg"><label>IN DEVELOPMENT?</label>
+                  <select id="pr-dev-${i}">
+                    <option value="false" ${!pr.inDevelopment ? "selected" : ""}>No</option>
+                    <option value="true" ${pr.inDevelopment ? "selected" : ""}>Yes (In Development)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fg"><label>SUMMARY</label><textarea id="pr-sum-${i}" rows="2">${esc(pr.summary)}</textarea></div>
+              <div class="fg"><label>HIGHLIGHTS (ONE PER LINE)</label><textarea id="pr-hl-${i}" rows="3">${esc(pr.highlights.join("\n"))}</textarea></div>
+              <div class="grid-2">
+                <div class="fg"><label>TECH TAGS (COMMA SEPARATED)</label><input id="pr-tech-${i}" value="${esc(pr.tech.join(", "))}"></div>
+                <div class="fg"><label>GITHUB MATCH KEYWORDS</label><input id="pr-kw-${i}" value="${esc((pr.repoKeywords || []).join(", "))}"></div>
+              </div>
+            </div>
+          `).join("")}
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <button class="btn-outline" onclick="addProj()">Add Project</button>
+            <button class="btn-primary" onclick="saveProjs()">Save Projects</button>
+          </div>
+        `;
+      } else if (tab === "skills") {
+        panel = `
+          <div class="fg"><label>LANGUAGES (Name:Level)</label><input id="sk-l" value="${esc(state.skills.languages.map(l => `${l.name}:${l.level}`).join(", "))}"></div>
+          <div class="fg"><label>TOOLS</label><input id="sk-t" value="${esc(state.skills.tools.join(", "))}"></div>
+          <div class="fg"><label>FRAMEWORKS &amp; DOMAINS</label><input id="sk-f" value="${esc(state.skills.frameworks.join(", "))}"></div>
+          <div class="fg"><label>SOFT SKILLS</label><input id="sk-s" value="${esc(state.skills.softSkills.join(", "))}"></div>
+          <button class="btn-primary" onclick="saveSkills()">Save Capabilities</button>
+        `;
+      } else if (tab === "publish") {
+        panel = `
+          <div class="s-box">
+            <h4 style="color:var(--gold-light); margin-bottom:0.45rem;">Update Owner Passcode</h4>
+            <div class="grid-2">
+              <div class="fg"><label>NEW PASSCODE</label><input type="password" id="np1" placeholder="Min 4 chars"></div>
+              <div class="fg"><label>CONFIRM PASSCODE</label><input type="password" id="np2" placeholder="Repeat passcode"></div>
+            </div>
+            <button class="btn-outline" onclick="updatePass()">Update Passcode</button>
+          </div>
+          <div class="s-box">
+            <h4 style="color:var(--sapphire-soft); margin-bottom:0.45rem;">Export Permanent Portfolio Build</h4>
+            <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:0.9rem;">
+              Downloads a self-contained <strong>index.html</strong> with your uploaded photo, updated projects, and passcode embedded permanently.
+            </p>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+              <button class="btn-primary" onclick="exportHtml()">Export Updated index.html</button>
+              <button class="f-btn" onclick="resetDefaults()">Reset Defaults</button>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById("studio-body").innerHTML = `
+        <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--gold-light);">OWNER STUDIO</span>
+        <h2 style="font-size:1.45rem; font-weight:600; margin-top:0.2rem;">Portfolio Configuration</h2>
+        <div class="studio-tabs">
+          <button class="s-tab ${tab === "identity" ? "active" : ""}" onclick="renderStudio('identity')">Identity &amp; Photo</button>
+          <button class="s-tab ${tab === "projects" ? "active" : ""}" onclick="renderStudio('projects')">Projects</button>
+          <button class="s-tab ${tab === "skills" ? "active" : ""}" onclick="renderStudio('skills')">Capabilities</button>
+          <button class="s-tab ${tab === "publish" ? "active" : ""}" onclick="renderStudio('publish')">Security &amp; Export</button>
+        </div>
+        ${panel}
+      `;
+    }
+
+    function commit(note) {
+      localStorage.setItem(DATA_KEY, JSON.stringify(state));
+      renderAll();
+      syncLiveApis();
+      whisper(note || "Saved.");
+    }
+    function uploadPhoto(e) {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+          const s = Math.min(1, 560 / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = img.width * s; c.height = img.height * s;
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          state.profile.photoDataUrl = c.toDataURL("image/jpeg", 0.88);
+          commit("Portrait updated.");
+        };
+        img.src = ev.target.result;
+      };
+      r.readAsDataURL(f);
+    }
+    function clearPhoto() { state.profile.photoDataUrl = ""; commit("Portrait cleared."); }
+
+    function saveIdentity() {
+      const p = state.profile;
+      p.name = document.getElementById("ed-name").value.trim();
+      p.kicker = document.getElementById("ed-kicker").value.trim();
+      p.role = document.getElementById("ed-role").value.trim();
+      p.location = document.getElementById("ed-loc").value.trim();
+      p.cgpa = document.getElementById("ed-cgpa").value.trim();
+      p.hsc = document.getElementById("ed-hsc").value.trim();
+      p.email = document.getElementById("ed-email").value.trim();
+      p.phone = document.getElementById("ed-phone").value.trim();
+      p.githubUsername = document.getElementById("ed-gh").value.trim();
+      p.leetcodeUsername = document.getElementById("ed-lc").value.trim();
+      p.linkedinHandle = document.getElementById("ed-li").value.trim();
+      p.leetcodeFallback = {
+        total: document.getElementById("ed-lc-tot").value.trim(),
+        easy: document.getElementById("ed-lc-ez").value.trim(),
+        medHard: document.getElementById("ed-lc-mh").value.trim(),
+        note: "Snapshot configured in Owner Studio."
+      };
+      p.summary = document.getElementById("ed-sum").value.trim();
+      commit("Identity saved.");
+      closeModal("studio-modal");
+    }
+
+    function addProj() {
+      state.projects.push({
+        id: "p-" + Date.now(), status: "In Development", inDevelopment: true, repoKeywords: [],
+        title: "New Project", subtitle: "Subtitle", summary: "Summary.", highlights: ["Highlight."],
+        flow: [{ step: "01 / IN", label: "Input" }, { step: "02 / CORE", label: "Engine" }, { step: "03 / OUT", label: "Output" }],
+        tech: ["Python"]
+      });
+      renderStudio("projects");
+    }
+    function delProj(i) {
+      state.projects.splice(i, 1);
+      if (activeProjectIdx >= state.projects.length) activeProjectIdx = 0;
+      commit("Project removed.");
+      renderStudio("projects");
+    }
+    function saveProjs() {
+      state.projects = state.projects.map((old, i) => ({
+        ...old,
+        title: document.getElementById(`pr-t-${i}`).value.trim(),
+        status: document.getElementById(`pr-st-${i}`).value.trim(),
+        subtitle: document.getElementById(`pr-sub-${i}`).value.trim(),
+        inDevelopment: document.getElementById(`pr-dev-${i}`).value === "true",
+        summary: document.getElementById(`pr-sum-${i}`).value.trim(),
+        highlights: document.getElementById(`pr-hl-${i}`).value.split("\n").map(x => x.trim()).filter(Boolean),
+        tech: document.getElementById(`pr-tech-${i}`).value.split(",").map(x => x.trim()).filter(Boolean),
+        repoKeywords: document.getElementById(`pr-kw-${i}`).value.split(",").map(x => x.trim()).filter(Boolean)
+      }));
+      commit("Projects updated.");
+      closeModal("studio-modal");
+    }
+
+    function saveSkills() {
+      state.skills.languages = document.getElementById("sk-l").value.split(",").map(x => {
+        const [n, lv] = x.split(":").map(s => s.trim());
+        return { name: n, level: Math.min(100, Math.max(10, parseInt(lv || "80", 10))) };
+      }).filter(x => x.name);
+      state.skills.tools = document.getElementById("sk-t").value.split(",").map(x => x.trim()).filter(Boolean);
+      state.skills.frameworks = document.getElementById("sk-f").value.split(",").map(x => x.trim()).filter(Boolean);
+      state.skills.softSkills = document.getElementById("sk-s").value.split(",").map(x => x.trim()).filter(Boolean);
+      commit("Capabilities updated.");
+      closeModal("studio-modal");
+    }
+
+    function updatePass() {
+      const a = document.getElementById("np1").value;
+      const b = document.getElementById("np2").value;
+      if (!a || a.length < 4) return alert("Minimum 4 characters.");
+      if (a !== b) return alert("Passcodes do not match.");
+      localStorage.setItem(HASH_KEY, sha256Sync(a));
+      alert("Passcode updated. Export updated index.html to save permanently.");
+    }
+
+    function exportHtml() {
+      const safeJson = JSON.stringify(state, null, 2).replace(/<\//g, "<\\/");
+      const h = getPassHash();
+      let html = CLEAN_SNAPSHOT
+        .replace(/\/\*__HASH_START__\*\/[\s\S]*?\/\*__HASH_END__\*\//, `/*__HASH_START__*/\n    const DEFAULT_PASS_HASH = "${h}";\n    /*__HASH_END__*/`)
+        .replace(/\/\*__DATA_START__\*\/[\s\S]*?\/\*__DATA_END__\*\//, `/*__DATA_START__*/\n    const DEFAULT_DATA = ${safeJson};\n    /*__DATA_END__*/`);
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "index.html";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      whisper("Exported index.html.");
+    }
+
+    function resetDefaults() {
+      if (!confirm("Restore default configuration?")) return;
+      localStorage.removeItem(DATA_KEY);
+      state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      commit("Defaults restored.");
+      renderStudio("identity");
+    }
+
+    function copyContact(which) {
+      const val = which === "email" ? state.profile.email : state.profile.phone;
+      navigator.clipboard?.writeText(val);
+      whisper(`Copied: ${val}`);
+    }
+    function submitMail(e) {
+      e.preventDefault();
+      const n = document.getElementById("m-name").value.trim();
+      const m = document.getElementById("m-body").value.trim();
+      window.location.href = `mailto:${state.profile.email}?subject=${encodeURIComponent("Portfolio Inquiry — " + n)}&body=${encodeURIComponent(m)}`;
+    }
+
+    const pCard = document.getElementById("portrait-card");
+    pCard.addEventListener("mousemove", e => {
+      const r = pCard.getBoundingClientRect();
+      const rx = ((e.clientY - r.top) / r.height - 0.5) * -10;
+      const ry = ((e.clientX - r.left) / r.width - 0.5) * 10;
+      pCard.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+    pCard.addEventListener("mouseleave", () => { pCard.style.transform = "rotateX(0deg) rotateY(0deg)"; });
+
+    window.addEventListener("keydown", e => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        openOwnerAuth();
+      }
+    });
+
+    function initReveals() {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(en => { if (en.isIntersecting) en.target.classList.add("in"); });
+      }, { threshold: 0.1 });
+      document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderAll();
+      initBackground3D();
+      initUniqueCursor();
+      init3DRoverBot();
+      initReveals();
+      syncLiveApis();
+    });
+  </script>
+</body>
+</html>
